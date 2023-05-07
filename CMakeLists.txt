@@ -13,8 +13,8 @@ find_package(OpenGL REQUIRED)
 set( GLFW_DIR 
 ${CMAKE_CURRENT_SOURCE_DIR}/GLFW)
 
-file(GLOB SOURCES "*.cpp" ${GLFW_DIR}/include/glad/glad/glad.c )
-file(GLOB HEADERS "*.h" )
+file(GLOB SOURCES "*.cpp" ${GLFW_DIR}/include/glad/glad/glad.c)
+file(GLOB HEADERS "*.h" "*.hpp")
 file(GLOB SHADERS "*.vert" "*.frag" "*.vs" "*.fs" )
 
 include_directories( 
@@ -24,6 +24,7 @@ include_directories(
     ${GLFW_DIR}/include/glew
     ${GLFW_DIR}/include/glm
     ${GLFW_DIR}/include/freeglut
+	${GLFW_DIR}/include/stb/
 )
 
 message( "\nBuild mode test is: ${CMAKE_BUILD_TYPE}" )
