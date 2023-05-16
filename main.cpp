@@ -1,7 +1,9 @@
 #include <stdio.h>
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/opengl.hpp>
 #include "aruco_samples_utility.hpp"
+
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -67,10 +69,10 @@ int main(int argc, char** argv ){
 
     float vertices[40] = {
         // positions          // texture coords
-        0.5f,  0.5f, -0.5f, 0.0f, 0.0f, // 0
+        -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, // 0
          0.5f,  0.5f, -0.5f, 0.0f, 0.0f, // 1
          0.5f,  0.5f,  0.5f, 0.0f, 0.0f, // 2
-        0.5f,  0.5f,  0.5f, 0.0f, 0.0f, // 3
+        -0.5f,  0.5f,  0.5f, 0.0f, 0.0f, // 3
 
         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // 4
          0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // 5
@@ -180,6 +182,25 @@ int main(int argc, char** argv ){
             for(unsigned int i = 0; i < ids.size(); i++) {
                 cv::drawFrameAxes(frame_output, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
             }
+
+            //for (size_t i = 0; i < rvecs.size(); ++i)
+
+
+            // Convertir los valores de rotación y traslación a glm::vec3
+            glm::vec3 rotationVector(rvecs[0][0], rvecs[0][1], rvecs[0][2]);
+            glm::vec3 translationVector(tvecs[0][0], tvecs[0][1], tvecs[0][2]);
+
+            // Crear la matriz de transformación
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, translationVector);
+            model = glm::rotate(model, rotationVector.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, rotationVector.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            model = glm::rotate(model, rotationVector.z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+
+        }
+        else {
+            //model = glm::mat4(1.0f);
         }
 
         //stbi_set_flip_vertically_on_load(true); // doesnt work!! tell stb_image.h to flip loaded texture's on the y-axis.
@@ -191,9 +212,9 @@ int main(int argc, char** argv ){
    
         // Draw texture in GLFW window
         glLoadIdentity();
-
+        
         CVOutput.render(frame_output);
-        cubito.render(glm::mat4(1.0f), glm::mat4(1.0f), glm::mat4(1.0f), glm::mat4(1.0f));
+        cubito.render(model, view, projection);
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

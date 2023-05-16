@@ -26,8 +26,11 @@ public:
         // texture coord attribute
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
+
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
     void render(cv::Mat frame_output) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glActiveTexture(GL_TEXTURE0);
         
         //glMatrixMode(GL_MODELVIEW);     

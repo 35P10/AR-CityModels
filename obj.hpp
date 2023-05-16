@@ -18,11 +18,9 @@ public:
     void setColor(glm::vec4 new_color) {
         color = new_color;
     }
-    void render(glm::mat4 transform, glm::mat4 model, glm::mat4 view, glm::mat4 projection) {
+    void render(glm::mat4 model, glm::mat4 view, glm::mat4 projection) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glUseProgram(shaderProgram);
-
-        unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
         unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -66,7 +64,7 @@ public:
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) <35P10/>;
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
     ~Cube() {
         glDeleteVertexArrays(1, &VAO);
@@ -83,13 +81,12 @@ private:
     bool shader() {
         const char* vertexShaderSource = "#version 330 core\n"
             "layout(location = 0) in vec3 aPos; \n"
-            "uniform mat4 transform; \n"
             "uniform mat4 model; \n"
             "uniform mat4 view; \n"
             "uniform mat4 projection; \n"
             "void main()\n"
             "{\n"
-            "    gl_Position = projection * view * model * transform * vec4(aPos, 1.0);\n"
+            "    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
             "}\n";
         const char* fragmentShaderSource = "#version 330 core\n"
             "out vec4 FragColor;\n"
