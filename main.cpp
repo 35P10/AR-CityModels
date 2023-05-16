@@ -6,18 +6,27 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "stb_image.h"
-#include <stb_image.h>
+#include <vector>
+
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+
+#include "obj.hpp"
+#include "plane_texture.hpp"
 
 using namespace cv;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
+void create_chArucoBoard();
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 640;
+const unsigned int SCR_HEIGHT = 480;
 
 int main(int argc, char** argv ){
  // glfw: initialize and configure
@@ -56,8 +65,47 @@ int main(int argc, char** argv ){
         return -1;
     }  
 
-    /////////////////////////////////////////////////////////////////////////
-   
+    float vertices[40] = {
+        // positions          // texture coords
+        0.5f,  0.5f, -0.5f, 0.0f, 0.0f, // 0
+         0.5f,  0.5f, -0.5f, 0.0f, 0.0f, // 1
+         0.5f,  0.5f,  0.5f, 0.0f, 0.0f, // 2
+        0.5f,  0.5f,  0.5f, 0.0f, 0.0f, // 3
+
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // 4
+         0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // 5
+         0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // 6
+        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // 7
+    };
+
+    unsigned int indices[36] = {
+        0, 1, 2, //up
+        0, 2, 3,
+
+        0, 1, 5, //behind
+        0, 4, 5,
+
+        0, 3, 4, //left
+        3, 4, 7,
+
+        1, 2, 5, //right
+        2, 5, 6,
+
+        2, 3, 6, //front
+        5, 6, 7,
+
+        4, 5, 6, //down
+        4, 6, 7
+    };
+
+    Cube cubito(vertices,indices);
+    
+    glm::mat4 transform = glm::mat4(1.0f);
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+
+
     cv::VideoCapture inputVideo(0);
     
     glEnable(GL_TEXTURE_2D);     // Enable 2D texturing
@@ -93,14 +141,23 @@ int main(int argc, char** argv ){
     cv::aruco::Dictionary dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
     aruco::ArucoDetector detector(dictionary, detectorParams);
 
+    cv::Mat frame_input, frame_output;
+
+    Plane_texture CVOutput;
+    
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load image, create texture and generate mipmaps
+
     while(!glfwWindowShouldClose(window))
     {
         // input
         // -----
         processInput(window);
-        // render
-        // ------   
-        cv::Mat frame_input, frame_output;
+
         inputVideo.retrieve(frame_input);
         frame_input.copyTo(frame_output);
 
@@ -112,6 +169,8 @@ int main(int argc, char** argv ){
         if (ids.size() > 0) {
             cv::aruco::drawDetectedMarkers(frame_output, corners, ids);
             int nMarkers = corners.size();
+
+            // matriz de rotacion y translacion de cada marker
             std::vector<cv::Vec3d> rvecs(nMarkers), tvecs(nMarkers);
             // Calculate pose for each marker
             for (int i = 0; i < nMarkers; i++) {
@@ -123,45 +182,24 @@ int main(int argc, char** argv ){
             }
         }
 
-
+        //stbi_set_flip_vertically_on_load(true); // doesnt work!! tell stb_image.h to flip loaded texture's on the y-axis.
         flip(frame_output, frame_output, 0); // flip loaded frame on the y-axis.
 
-        
-        /* OpenGL texture binding of the image loaded by DevIL  */
-        unsigned int texture;
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, frame_output.cols, frame_output.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, frame_output.data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        
-        //stbi_set_flip_vertically_on_load(true); // doesnt work!! tell stb_image.h to flip loaded texture's on the y-axis.
-        /*
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f); 
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClearDepth(0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the window
-        
-        // Clear color and depth buffers
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,texture);
-        glMatrixMode(GL_MODELVIEW);     // Operate on model-view matrix
-        */
-       
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   
         // Draw texture in GLFW window
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 0.0f); glVertex2f(-1.0f, -1.0f);
-        glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, -1.0f);
-        glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex2f(-1.0f, 1.0f);
-        glEnd();
+        glLoadIdentity();
 
-
+        CVOutput.render(frame_output);
+        cubito.render(glm::mat4(1.0f), glm::mat4(1.0f), glm::mat4(1.0f), glm::mat4(1.0f));
+        
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
 
-        glDeleteTextures(1, &texture);
     }
 
     inputVideo.release();
@@ -185,3 +223,4 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
+
