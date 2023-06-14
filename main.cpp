@@ -19,6 +19,8 @@
 
 #include "obj.hpp"
 #include "plane_texture.hpp"
+#include "charuco_calibration.hpp"
+#include "aruco_creator.hpp"
 
 using namespace cv;
 
@@ -67,6 +69,9 @@ int main(int argc, char** argv ){
         return -1;
     }  
 
+    //return take_images(5,7,0.02,0.01,"camera_prueba.yml");
+    
+
     float vertices[40] = {
         // positions          // texture coords
         -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, // 0
@@ -100,12 +105,12 @@ int main(int argc, char** argv ){
         4, 6, 7
     };
 
-    Cube cubito(vertices,indices);
+    //Cube cubito(vertices,indices);
     
-    glm::mat4 transform = glm::mat4(1.0f);
+
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(0.0f), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
 
 
     cv::VideoCapture inputVideo(0);
@@ -127,7 +132,7 @@ int main(int argc, char** argv ){
 
 
     cv::Mat cameraMatrix, distCoeffs;
-    float markerLength = 0.05;
+    float markerLength = 0.5f;
     
     // Read camera parameters from tutorial_camera_params.yml
     readCameraParameters("D:/Documents/Projects/openCV/camera_parameters.yml", cameraMatrix, distCoeffs); // This function is implemented in aruco_samples_utility.hpp
@@ -183,19 +188,28 @@ int main(int argc, char** argv ){
                 cv::drawFrameAxes(frame_output, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
             }
 
-            //for (size_t i = 0; i < rvecs.size(); ++i)
+            for (size_t i = 0; i < rvecs.size(); ++i) {
+
+                Cube cubito(vertices,indices);
+
+                // Convertir los valores de rotación y traslación a glm::vec3
+                glm::vec3 rotationVector(rvecs[i][0], rvecs[i][1], rvecs[i][2]);
+                glm::vec3 translationVector( tvecs[i][0], -1 * tvecs[i][1] , tvecs[i][2] );
+
+                std::cout << "translation " << i << " : " << tvecs[i][0] << " " << tvecs[i][1] << " " << tvecs[i][2] << std::endl;
+                
+                // Crear la matriz de transformación
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, translationVector);
+                model = glm::rotate(model, rotationVector.x, glm::vec3(1.0f, 0.0f, 0.0f));
+                model = glm::rotate(model, rotationVector.y, glm::vec3(0.0f, 1.0f, 0.0f));
+                model = glm::rotate(model, rotationVector.z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+                cubito.render(model, view, projection);
+            }
+            
 
 
-            // Convertir los valores de rotación y traslación a glm::vec3
-            glm::vec3 rotationVector(rvecs[0][0], rvecs[0][1], rvecs[0][2]);
-            glm::vec3 translationVector(tvecs[0][0], tvecs[0][1], tvecs[0][2]);
-
-            // Crear la matriz de transformación
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, translationVector);
-            model = glm::rotate(model, rotationVector.x, glm::vec3(1.0f, 0.0f, 0.0f));
-            model = glm::rotate(model, rotationVector.y, glm::vec3(0.0f, 1.0f, 0.0f));
-            model = glm::rotate(model, rotationVector.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
 
         }
@@ -214,7 +228,7 @@ int main(int argc, char** argv ){
         glLoadIdentity();
         
         CVOutput.render(frame_output);
-        cubito.render(model, view, projection);
+        
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
