@@ -197,6 +197,36 @@ int main(int argc, char** argv ){
             model = glm::rotate(model, rotationVector.y, glm::vec3(0.0f, 1.0f, 0.0f));
             model = glm::rotate(model, rotationVector.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
+            int i = 0;
+            cv::Mat viewMatrix = cv::Mat::zeros(4, 4, CV_32F);;
+			    cv::Mat viewMatrixavg = cv::Mat::zeros(4, 4, CV_32F);
+                cv::Vec3d r = rvecs[i];
+			    cv::Vec3d t = tvecs[i];
+
+            	cv::Mat rot;
+			    Rodrigues(rvecs[i], rot);
+                for (unsigned int row = 0; row < 3; ++row){
+                    for (unsigned int col = 0; col < 3; ++col)
+                    {
+                        viewMatrix.at<float>(row, col) = (float)rot.at<double>(row, col);
+                    }
+                    viewMatrix.at<float>(row, 3) = (float)tvecs[i][row] * 0.1f;
+                }
+                viewMatrix.at<float>(3, 3) = 1.0f;
+
+                cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
+                cvToGl.at<float>(0, 0) = 1.0f;
+                cvToGl.at<float>(1, 1) = -1.0f; // Invert the y axis 
+                cvToGl.at<float>(2, 2) = -1.0f; // invert the z axis 
+                cvToGl.at<float>(3, 3) = 1.0f;
+                viewMatrix = cvToGl * viewMatrix;
+                cv::transpose(viewMatrix, viewMatrix);
+                
+                for (int i = 0; i < 4; i++) {
+                    for (int j = 0; j < 4; j++) {
+                        view[i][j] = viewMatrix.at<float>(i, j);
+                    }
+                }
 
         }
         else {
@@ -214,7 +244,7 @@ int main(int argc, char** argv ){
         glLoadIdentity();
         
         CVOutput.render(frame_output);
-        cubito.render(model, view, projection);
+        cubito.render(glm::mat4(1.0f), view, projection);
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
