@@ -109,7 +109,7 @@ int main(int argc, char** argv ){
         4, 6, 7
     };
 
-    //Cube cubito(vertices,indices);
+    Cube cubito(vertices,indices);
     
 
     glm::mat4 model = glm::mat4(1.0f);
