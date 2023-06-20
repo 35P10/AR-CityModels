@@ -32,6 +32,10 @@ void create_chArucoBoard();
 const unsigned int SCR_WIDTH = 640;
 const unsigned int SCR_HEIGHT = 480;
 
+#ifndef M_PI
+#define M_PI       3.14159265358979323846f
+#endif
+
 int main(int argc, char** argv ){
  // glfw: initialize and configure
     // ------------------------------
@@ -110,7 +114,19 @@ int main(int argc, char** argv ){
 
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection = glm::perspective(glm::radians(0.0f), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+    
+    float fov = 53.13f;
+    float nearp = 0.1f;
+    float farp = 10.0f;
+    float ratio = (1.0f * SCR_WIDTH) / SCR_HEIGHT;
+    float f = 1.0f / tan(fov * (M_PI / 360.0f));
+    projection[0][0] = f / ratio;
+	projection[1][1] = f;
+	projection[2][2] = (farp + nearp) / (nearp - farp);
+	projection[3][2] = (2.0f * farp * nearp) / (nearp - farp);
+	projection[2][3] = -1.0f;
+	projection[3][3] = 0.0f;
 
 
     cv::VideoCapture inputVideo(0);
@@ -132,11 +148,21 @@ int main(int argc, char** argv ){
 
 
     cv::Mat cameraMatrix, distCoeffs;
-    float markerLength = 0.5f;
+    const float markerLength = 10.0f;
     
     // Read camera parameters from tutorial_camera_params.yml
-    readCameraParameters("D:/Documents/Projects/openCV/camera_parameters.yml", cameraMatrix, distCoeffs); // This function is implemented in aruco_samples_utility.hpp
+    //readCameraParameters("D:/Documents/Projects/openCV/camera_parameters.yml", cameraMatrix, distCoeffs); // This function is implemented in aruco_samples_utility.hpp
+    // Distortion coeffs (fill in your actual values here).
+    double K_[3][3] =
+    { { 675, 0, 320 },
+    { 0, 675, 240 },
+    { 0, 0, 1 } };
+    cameraMatrix = cv::Mat(3, 3, CV_64F, K_).clone();
+
+    double dist_[] = { 0, 0, 0, 0, 0 };
+    distCoeffs = cv::Mat(5, 1, CV_64F, dist_).clone();
     
+
     // Set coordinate system
     cv::Mat objPoints(4, 1, CV_32FC3);
     objPoints.ptr<cv::Vec3f>(0)[0] = cv::Vec3f(-markerLength/2.f, markerLength/2.f, 0);
@@ -188,33 +214,42 @@ int main(int argc, char** argv ){
                 cv::drawFrameAxes(frame_output, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
             }
 
-            for (size_t i = 0; i < rvecs.size(); ++i) {
+            //for (size_t i = 0; i < rvecs.size(); ++i)
+            int i = 0;
+            cv::Mat viewMatrix = cv::Mat::zeros(4, 4, CV_32F);;
+			    cv::Mat viewMatrixavg = cv::Mat::zeros(4, 4, CV_32F);
+                cv::Vec3d r = rvecs[i];
+			    cv::Vec3d t = tvecs[i];
 
-                Cube cubito(vertices,indices);
+            	cv::Mat rot;
+			    Rodrigues(rvecs[i], rot);
+                for (unsigned int row = 0; row < 3; ++row){
+                    for (unsigned int col = 0; col < 3; ++col)
+                    {
+                        viewMatrix.at<float>(row, col) = (float)rot.at<double>(row, col);
+                    }
+                    viewMatrix.at<float>(row, 3) = (float)tvecs[i][row] * 0.1f;
+                }
+                viewMatrix.at<float>(3, 3) = 1.0f;
 
-                // Convertir los valores de rotación y traslación a glm::vec3
-                glm::vec3 rotationVector(rvecs[i][0], rvecs[i][1], rvecs[i][2]);
-                glm::vec3 translationVector( tvecs[i][0], -1 * tvecs[i][1] , tvecs[i][2] );
+                cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
+                cvToGl.at<float>(0, 0) = 1.0f;
+                cvToGl.at<float>(1, 1) = -1.0f; // Invert the y axis 
+                cvToGl.at<float>(2, 2) = -1.0f; // invert the z axis 
+                cvToGl.at<float>(3, 3) = 1.0f;
 
-                std::cout << "translation " << i << " : " << tvecs[i][0] << " " << tvecs[i][1] << " " << tvecs[i][2] << std::endl;
+                viewMatrix = cvToGl * viewMatrix;
+                cv::transpose(viewMatrix, viewMatrix);
                 
-                // Crear la matriz de transformación
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, translationVector);
-                model = glm::rotate(model, rotationVector.x, glm::vec3(1.0f, 0.0f, 0.0f));
-                model = glm::rotate(model, rotationVector.y, glm::vec3(0.0f, 1.0f, 0.0f));
-                model = glm::rotate(model, rotationVector.z, glm::vec3(0.0f, 0.0f, 1.0f));
-
-                cubito.render(model, view, projection);
-            }
-            
-
-
-
-
+                // CV to GL
+                for (int i = 0; i < 4; i++) {
+                    for (int j = 0; j < 4; j++) {
+                        view[i][j] = viewMatrix.at<float>(i, j);
+                    }
+                }
         }
         else {
-            //model = glm::mat4(1.0f);
+            view = glm::mat4(1.0f);
         }
 
         //stbi_set_flip_vertically_on_load(true); // doesnt work!! tell stb_image.h to flip loaded texture's on the y-axis.
@@ -228,7 +263,10 @@ int main(int argc, char** argv ){
         glLoadIdentity();
         
         CVOutput.render(frame_output);
+
         
+
+        cubito.render(glm::mat4(1.0f), view, projection);
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
