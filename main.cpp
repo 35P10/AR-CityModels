@@ -16,11 +16,16 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <filesystem>
 
 #include "obj.hpp"
 #include "plane_texture.hpp"
 #include "charuco_calibration.hpp"
 #include "aruco_creator.hpp"
+
+#include "shader.hpp"
+#include "mesh.hpp"
+#include "model.hpp"
 
 using namespace cv;
 
@@ -31,6 +36,28 @@ void create_chArucoBoard();
 // settings
 const unsigned int SCR_WIDTH = 640;
 const unsigned int SCR_HEIGHT = 480;
+
+const char* vertexShaderSourceModel = "#version 330 core\n"
+    "layout(location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec3 aNormal;\n"
+    "layout (location = 2) in vec2 aTexCoords;\n"
+    "out vec2 TexCoords;\n"
+    "uniform mat4 model; \n"
+    "uniform mat4 view; \n"
+    "uniform mat4 projection; \n"
+    "void main()\n"
+    "{\n"
+    "    TexCoords = aTexCoords; "
+    "    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
+    "}\n";
+const char* fragmentShaderSourceModel = "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "in vec2 TexCoords;\n"
+    "uniform sampler2D texture_diffuse1;\n"
+    "void main()\n"
+    "{\n"
+    "   FragColor = texture(texture_diffuse1, TexCoords);\n"
+    "}\n\0";
 
 #ifndef M_PI
 #define M_PI       3.14159265358979323846f
@@ -75,6 +102,25 @@ int main(int argc, char** argv ){
 
     //return take_images(5,7,0.02,0.01,"camera_prueba.yml");
     
+    ///////////////////////
+
+    // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
+    stbi_set_flip_vertically_on_load(true);
+
+    // configure global opengl state
+    // -----------------------------
+    glEnable(GL_DEPTH_TEST);
+
+    // build and compile shaders
+    // -------------------------
+    Shader ourShader("D:/Documents/Projects/ComputerGraphics-FinalProject/vertex_shader.vs", "D:/Documents/Projects/ComputerGraphics-FinalProject/fragment_shader_model.fs");
+
+    // load models
+    // -----------
+    Model ourModel("D:/Downloads/backpack/backpack.obj");
+
+
+    //////////////////////////////
 
     float vertices[40] = {
         // positions          // texture coords
@@ -256,17 +302,23 @@ int main(int argc, char** argv ){
         flip(frame_output, frame_output, 0); // flip loaded frame on the y-axis.
 
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        glClearDepth(0.0f);
+        //glClearDepth(0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    
         // Draw texture in GLFW window
-        glLoadIdentity();
+        //glLoadIdentity();
         
-        CVOutput.render(frame_output);
+        //CVOutput.render(frame_output);
 
-        
+        // don't forget to enable shader before setting uniforms
+        ourShader.use();
+        // view/projection transformations
+        ourShader.setMat4("projection", projection);
+        ourShader.setMat4("view", view);
+        ourShader.setMat4("model", glm::mat4(1.0f));
+        ourModel.Draw(ourShader);
 
-        cubito.render(glm::mat4(1.0f), view, projection);
+        //cubito.render(glm::mat4(1.0f), view, projection);
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
