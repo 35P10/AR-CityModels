@@ -113,12 +113,13 @@ int main(int argc, char** argv ){
 
     // build and compile shaders
     // -------------------------
-    Shader ourShader("D:/Documents/Projects/ComputerGraphics-FinalProject/vertex_shader.vs", "D:/Documents/Projects/ComputerGraphics-FinalProject/fragment_shader_model.fs");
+    Shader ourShader("D:/Documents/Projects/ComputerGraphics-FinalProject/resources/shader/vertex_shader_models.vs", "D:/Documents/Projects/ComputerGraphics-FinalProject/resources/shader/fragment_shader_model.fs");
 
     // load models
     // -----------
     Model ourModel("D:/Downloads/backpack/backpack.obj");
 
+    Shader cvVideoShader("D:/Documents/Projects/ComputerGraphics-FinalProject/resources/shader/vertex_shader_texture.vs", "D:/Documents/Projects/ComputerGraphics-FinalProject/resources/shader/fragment_shader_texture.fs");
 
     //////////////////////////////
 
@@ -307,11 +308,11 @@ int main(int argc, char** argv ){
    
         // Draw texture in GLFW window
         //glLoadIdentity();
-        
-        //CVOutput.render(frame_output);
+        //CVOutput.render(cvVideoShader, frame_output);
 
         // don't forget to enable shader before setting uniforms
         ourShader.use();
+        std::cout << view[0][3] << " " << view[1][3] << " " << view[2][3] << std::endl;
         // view/projection transformations
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
