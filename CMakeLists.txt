@@ -70,6 +70,51 @@ link_directories(${assimp_DIR})
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/dlls)
 
+# Definir un directorio de salida para los archivos binarios
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
+
+# Agregar el directorio de salida a las rutas de búsqueda de CMake
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/debug)
+
+message( "\nCopy files in Debug ****************" )
+message( "DEBUG DIR in: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}\n****************" )
+
+# copy shader files to build directory
+file(GLOB SHADERS
+			"resources/shader/*.vs"
+			"resources/shader/*.fs"
+)
+
+file(GLOB DLLS "dlls/*.dll")
+
+file(GLOB OBJ_DIR LIST_DIRECTORIES true "resources/objects/*")
+foreach(OBJ_DIR ${OBJ_DIR})
+	message("Carpetas OBJ: ${OBJ_DIR}")
+	get_filename_component(DIR_NAME ${OBJ_DIR} NAME)
+	message("Folder found: ${DIR_NAME}")
+	file(GLOB OBJ_FILE 
+				"${OBJ_DIR}/*.jpg"
+				"${OBJ_DIR}/*.mtl"
+				"${OBJ_DIR}/*.obj"
+				"${OBJ_DIR}/*.png"
+				"${OBJ_DIR}/*.txt"
+	)
+	foreach(OBJ_FILE ${OBJ_FILE})
+		message("Archivo OBJ: ${OBJ_FILE}")
+		file(COPY ${OBJ_FILE} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/resources/objects/${DIR_NAME})
+	endforeach()
+endforeach()
+
+foreach(DLL ${DLLS})
+  message("Archivo DLL: ${DLL}")
+  file(COPY ${DLLS} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG})
+endforeach()
+
+foreach(SHADERS ${SHADERS})
+message("File SHADERS: ${SHADERS}")
+	file(COPY ${SHADERS} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/resources/shader)
+endforeach()
+
 add_executable( ${PROJECT_NAME}  ${HEADERS} ${SOURCES} ${SHADERS} )
 
 target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} )

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <filesystem>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/opengl.hpp>
@@ -28,6 +29,7 @@
 #include "model.hpp"
 
 using namespace cv;
+namespace fs = std::filesystem;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -113,13 +115,22 @@ int main(int argc, char** argv ){
 
     // build and compile shaders
     // -------------------------
-    Shader ourShader("D:/Documents/Projects/ComputerGraphics-FinalProject/resources/shader/vertex_shader_models.vs", "D:/Documents/Projects/ComputerGraphics-FinalProject/resources/shader/fragment_shader_model.fs");
+    const string vertex_shader_model = fs::absolute("resources/shader/vertex_shader_model.vs").string();
+    const string fragment_shader_model = fs::absolute("resources/shader/fragment_shader_model.fs").string();
+    const string vertex_shader_texture = fs::absolute("resources/shader/vertex_shader_texture.vs").string();
+    const string fragment_shader_texture = fs::absolute("resources/shader/fragment_shader_texture.fs").string();
+    std::cout << "Cargar vertex_shader_model en: " << vertex_shader_model.c_str() << std::endl;
+    std::cout << "Cargar fragment_shader_model en: " << fragment_shader_model.c_str() << std::endl;
+    std::cout << "Cargar vertex_shader_texture en: " << vertex_shader_texture.c_str() << std::endl;
+    std::cout << "Cargar fragment_shader_texture en: " << fragment_shader_texture.c_str() << std::endl;
 
+    Shader ourShader(vertex_shader_model.c_str(), fragment_shader_model.c_str());
+    Shader cvVideoShader(vertex_shader_texture.c_str(), fragment_shader_texture.c_str());
     // load models
     // -----------
-    Model ourModel("D:/Downloads/backpack/backpack.obj");
-
-    Shader cvVideoShader("D:/Documents/Projects/ComputerGraphics-FinalProject/resources/shader/vertex_shader_texture.vs", "D:/Documents/Projects/ComputerGraphics-FinalProject/resources/shader/fragment_shader_texture.fs");
+    const string backpack_model = fs::absolute("resources/objects/backpack/backpack.obj").string();
+    std::cout << "Cargar backpack model en: " << backpack_model.c_str() << std::endl;
+    Model ourModel("D:/Downloads/ComputerGraphics-FinalProject/build/debug/resources/objects/backpack/backpack.obj");
 
     //////////////////////////////
 
