@@ -1,0 +1,57 @@
+# Blender 3.5.1 MTL File: 'tower.blend'
+# www.blender.org
+
+newmtl lambert2
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures//door51L.jpg
+map_Bump -bm 1.000000 textures//door51Lb.jpg
+
+newmtl lambert5
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd -o 0.352984 -0.191655 0 textures//sweden008.jpg
+map_Bump -o 0.352984 -0.191655 0 -bm 1.000000 textures//sweden008b.jpg
+
+newmtl lambert6
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd -o 0.447423 -0.30179 0 -s 0.5 0.5 1 textures//germany010.jpg
+map_Bump -o 0.447423 -0.30179 0 -s 0.5 0.5 1 -bm 1.000000 textures//germany010b.jpg
+
+newmtl lambert7
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures//pared2.jpg
+map_Bump -bm 1.000000 textures//pared2bump.jpg
+
+newmtl lambert8
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures//wndw038M.jpg
+map_Bump -bm 10.000000 textures//wndw038M.jpg

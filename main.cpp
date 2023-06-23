@@ -104,7 +104,7 @@ int main(int argc, char** argv ){
     }  
 
     //return take_images(5,7,0.02,0.01,"camera_prueba.yml");
-    
+    //return create_marker(22,"resources/markers/marker22.png");
     ///////////////////////
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
@@ -129,15 +129,16 @@ int main(int argc, char** argv ){
     Shader cvVideoShader(vertex_shader_texture.c_str(), fragment_shader_texture.c_str());
     // load models
     // -----------
-    const string backpack_model = fs::absolute("resources/objects/backpack/backpack.obj").string();
-    std::cout << "Cargar backpack model en: " << backpack_model.c_str() << std::endl;
-    Model ourModel("D:/Downloads/ComputerGraphics-FinalProject/build/debug/resources/objects/backpack/backpack.obj");
+    //const string backpack_model = fs::absolute("resources/objects/backpack/backpack.obj").string();
+    //std::cout << "Cargar backpack model en: " << backpack_model.c_str() << std::endl;
 
     std::map<int, Model> Models;
     std::map<int,glm::mat4> ModelViews;
 
+    Models[21].loadModel("D:/Downloads/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj");
+    Models[22].loadModel("D:/Downloads/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj");
     Models[23].loadModel("D:/Downloads/ComputerGraphics-FinalProject/resources/objects/backpack/backpack.obj");
-    Models[24].loadModel("D:/Downloads/ComputerGraphics-FinalProject/resources/objects/backpack/backpack.obj");
+    Models[24].loadModel("D:/Downloads/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj");
     //////////////////////////////
 
     float vertices[40] = {
