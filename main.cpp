@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <filesystem>
+#include <map>
 
 #include "obj.hpp"
 #include "plane_texture.hpp"
@@ -132,6 +133,11 @@ int main(int argc, char** argv ){
     std::cout << "Cargar backpack model en: " << backpack_model.c_str() << std::endl;
     Model ourModel("D:/Downloads/ComputerGraphics-FinalProject/build/debug/resources/objects/backpack/backpack.obj");
 
+    std::map<int, Model> Models;
+    std::map<int,glm::mat4> ModelViews;
+
+    Models[23].loadModel("D:/Downloads/ComputerGraphics-FinalProject/resources/objects/backpack/backpack.obj");
+    Models[24].loadModel("D:/Downloads/ComputerGraphics-FinalProject/resources/objects/backpack/backpack.obj");
     //////////////////////////////
 
     float vertices[40] = {
@@ -256,6 +262,7 @@ int main(int argc, char** argv ){
         std::vector<std::vector<cv::Point2f>> corners;
 
         detector.detectMarkers(frame_input, corners, ids);
+        for(auto i:ids) std::cout<< i << " ";
 
         if (ids.size() > 0) {
             cv::aruco::drawDetectedMarkers(frame_output, corners, ids);
@@ -272,9 +279,8 @@ int main(int argc, char** argv ){
                 cv::drawFrameAxes(frame_output, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
             }
 
-            //for (size_t i = 0; i < rvecs.size(); ++i)
-            int i = 0;
-            cv::Mat viewMatrix = cv::Mat::zeros(4, 4, CV_32F);;
+            for (size_t i = 0; i < rvecs.size(); ++i) {
+                cv::Mat viewMatrix = cv::Mat::zeros(4, 4, CV_32F);;
 			    cv::Mat viewMatrixavg = cv::Mat::zeros(4, 4, CV_32F);
                 cv::Vec3d r = rvecs[i];
 			    cv::Vec3d t = tvecs[i];
@@ -305,6 +311,9 @@ int main(int argc, char** argv ){
                         view[i][j] = viewMatrix.at<float>(i, j);
                     }
                 }
+
+                ModelViews[ids[i]] = view;
+            }
         }
         else {
             view = glm::mat4(1.0f);
@@ -322,13 +331,15 @@ int main(int argc, char** argv ){
         //CVOutput.render(cvVideoShader, frame_output);
 
         // don't forget to enable shader before setting uniforms
-        ourShader.use();
-        std::cout << view[0][3] << " " << view[1][3] << " " << view[2][3] << std::endl;
-        // view/projection transformations
-        ourShader.setMat4("projection", projection);
-        ourShader.setMat4("view", view);
-        ourShader.setMat4("model", glm::mat4(1.0f));
-        ourModel.Draw(ourShader);
+        for(auto i:ids){
+             ourShader.use();
+             std::cout << view[0][3] << " " << view[1][3] << " " << view[2][3] << std::endl;
+             // view/projection transformations
+             ourShader.setMat4("projection", projection);
+             ourShader.setMat4("view", ModelViews[i]);
+             ourShader.setMat4("model", glm::mat4(1.0f));
+             Models[i].Draw(ourShader);
+        }
 
         //cubito.render(glm::mat4(1.0f), view, projection);
         
