@@ -134,11 +134,18 @@ int main(int argc, char** argv ){
 
     std::map<int, Model> Models;
     std::map<int,glm::mat4> ModelViews;
+    std::map<int,glm::mat4> Transform;
 
-    Models[21].loadModel("D:/Downloads/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj");
-    Models[22].loadModel("D:/Downloads/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj");
-    Models[23].loadModel("D:/Downloads/ComputerGraphics-FinalProject/resources/objects/backpack/backpack.obj");
-    Models[24].loadModel("D:/Downloads/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj");
+
+    Transform[21] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
+    Transform[22] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
+    Transform[23] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
+    Transform[24] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));    
+
+    Models[21].loadModel("D:/Documentos/UNI/X-I semestre/GRAFICA/ComputerGraphics-FinalProject/resources/objects/house/house.obj");
+    Models[22].loadModel("D:/Documentos/UNI/X-I semestre/GRAFICA/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj");
+    Models[23].loadModel("D:/Documentos/UNI/X-I semestre/GRAFICA/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj");
+    Models[24].loadModel("D:/Documentos/UNI/X-I semestre/GRAFICA/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj");
     //////////////////////////////
 
     float vertices[40] = {
@@ -183,7 +190,7 @@ int main(int argc, char** argv ){
     
     float fov = 53.13f;
     float nearp = 0.1f;
-    float farp = 10.0f;
+    float farp = 20.0f;
     float ratio = (1.0f * SCR_WIDTH) / SCR_HEIGHT;
     float f = 1.0f / tan(fov * (M_PI / 360.0f));
     projection[0][0] = f / ratio;
@@ -338,7 +345,7 @@ int main(int argc, char** argv ){
              // view/projection transformations
              ourShader.setMat4("projection", projection);
              ourShader.setMat4("view", ModelViews[i]);
-             ourShader.setMat4("model", glm::mat4(1.0f));
+             ourShader.setMat4("model", Transform[i]);
              Models[i].Draw(ourShader);
         }
 
