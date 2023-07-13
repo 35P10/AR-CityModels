@@ -22,6 +22,7 @@
 
 #include "obj.hpp"
 #include "plane_texture.hpp"
+#include "plane.hpp"
 #include "charuco_calibration.hpp"
 #include "aruco_creator.hpp"
 
@@ -104,7 +105,6 @@ int main(int argc, char** argv ){
     }  
 
     //return take_images(5,7,0.02,0.01,"camera_prueba.yml");
-    //return create_marker(22,"resources/markers/marker22.png");
     ///////////////////////
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
@@ -120,6 +120,8 @@ int main(int argc, char** argv ){
     const string fragment_shader_model = fs::absolute("resources/shader/fragment_shader_model.fs").string();
     const string vertex_shader_texture = fs::absolute("resources/shader/vertex_shader_texture.vs").string();
     const string fragment_shader_texture = fs::absolute("resources/shader/fragment_shader_texture.fs").string();
+    const string vertex_shader_no_texture = fs::absolute("resources/shader/vertex_shader_no_texture.vs").string();
+    const string fragment_shader_no_texture = fs::absolute("resources/shader/fragment_shader_no_texture.fs").string();
     std::cout << "Cargar vertex_shader_model en: " << vertex_shader_model.c_str() << std::endl;
     std::cout << "Cargar fragment_shader_model en: " << fragment_shader_model.c_str() << std::endl;
     std::cout << "Cargar vertex_shader_texture en: " << vertex_shader_texture.c_str() << std::endl;
@@ -127,6 +129,7 @@ int main(int argc, char** argv ){
 
     Shader ourShader(vertex_shader_model.c_str(), fragment_shader_model.c_str());
     Shader cvVideoShader(vertex_shader_texture.c_str(), fragment_shader_texture.c_str());
+    Shader colorShader(vertex_shader_no_texture.c_str(), fragment_shader_no_texture.c_str());
     // load models
     // -----------
     //const string backpack_model = fs::absolute("resources/objects/backpack/backpack.obj").string();
@@ -142,10 +145,10 @@ int main(int argc, char** argv ){
     Transform[23] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
     Transform[24] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));    
 
-    Models[21].loadModel("D:/Documentos/UNI/X-I semestre/GRAFICA/ComputerGraphics-FinalProject/resources/objects/house/house.obj");
-    Models[22].loadModel("D:/Documentos/UNI/X-I semestre/GRAFICA/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj");
-    Models[23].loadModel("D:/Documentos/UNI/X-I semestre/GRAFICA/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj");
-    Models[24].loadModel("D:/Documentos/UNI/X-I semestre/GRAFICA/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj");
+    Models[21].loadModel("D:/Documents/Projects/ComputerGraphics-FinalProject/resources/objects/house/house.obj");
+    Models[22].loadModel("D:/Documents/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj");
+    Models[23].loadModel("D:/Documents/Projects/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj");
+    Models[24].loadModel("D:/Documents/Projects/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj");
     //////////////////////////////
 
     float vertices[40] = {
@@ -249,13 +252,8 @@ int main(int argc, char** argv ){
     cv::Mat frame_input, frame_output;
 
     Plane_texture CVOutput;
+    Plane Mockup_base;
     
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
 
     while(!glfwWindowShouldClose(window))
     {
@@ -338,10 +336,41 @@ int main(int argc, char** argv ){
         //glLoadIdentity();
         //CVOutput.render(cvVideoShader, frame_output);
 
+        //std::cout << "Mockup_base: ";
+        if(ModelViews.count(1) > 0) {
+            //std::cout << " Top Left 1; ";
+            //Mockup_base Top Left ID=1 detected
+            ModelViews[1] = projection * ModelViews[1];
+            Mockup_base.set_vertices_top_left(ModelViews[1][0][3], ModelViews[1][1][3], ModelViews[1][2][3]);
+        }
+        if(ModelViews.count(2) > 0) {
+            //std::cout << " Bottom Left 2; ";
+            //Mockup_base Bottom Left ID=2 detected
+            ModelViews[2] = projection * ModelViews[2];
+            Mockup_base.set_vertices_bottom_left(ModelViews[2][0][3], ModelViews[2][1][3], ModelViews[2][2][3]);
+        }
+        if(ModelViews.count(3) > 0) {
+            //std::cout << " Bottom Right 3; ";
+            //Mockup_base Bottom Right ID=3 detected
+            ModelViews[3] = projection * ModelViews[3];
+            Mockup_base.set_vertices_bottom_right(ModelViews[3][0][3], ModelViews[3][1][3], ModelViews[3][2][3]);
+        }
+        if(ModelViews.count(4) > 0) {
+            //std::cout << "Top Right 4; ";
+            //Mockup_base Top Right ID=4 detected
+            ModelViews[3] = projection * ModelViews[4];
+            Mockup_base.set_vertices_top_right(ModelViews[4][0][3], ModelViews[4][1][3], ModelViews[4][2][3]);
+        }
+        //std::cout << "detected\n";
+        Mockup_base.update_vertices();
+        // draw plane
+        colorShader.use();
+        Mockup_base.render(colorShader);
+
         // don't forget to enable shader before setting uniforms
         for(auto i:ids){
+            if(i == 1 || i == 2 || i == 3 || i == 4) continue;
              ourShader.use();
-             std::cout << view[0][3] << " " << view[1][3] << " " << view[2][3] << std::endl;
              // view/projection transformations
              ourShader.setMat4("projection", projection);
              ourShader.setMat4("view", ModelViews[i]);
