@@ -114,7 +114,7 @@ int main(int argc, char** argv ){
     // -----------------------------
     //glEnable(GL_DEPTH_TEST);
     glDisable(GL_DEPTH_TEST);
-    const float markerLength = 0.05f;
+    const float markerLength = 1.75f;
     // build and compile shaders
     // -------------------------
     const string vertex_shader_model = fs::absolute("resources/shader/vertex_shader_model.vs").string();
@@ -329,22 +329,22 @@ int main(int argc, char** argv ){
         if(ModelViews.count(1) > 0) {
             //std::cout << " Top Left 1; ";
             //Mockup_base Top Left ID=1 detected
-            Mockup_base.set_vertices_top_left(ModelViews[1][0][3], ModelViews[1][1][3], ModelViews[1][2][3]);
+            Mockup_base.set_vertices_top_left(ModelViews[1][3][0], ModelViews[1][3][1], ModelViews[1][3][2]);
         }
         if(ModelViews.count(2) > 0) {
             //std::cout << " Bottom Left 2; ";
             //Mockup_base Bottom Left ID=2 detected
-            Mockup_base.set_vertices_bottom_left(ModelViews[2][0][3], ModelViews[2][1][3], ModelViews[2][2][3]);
+            Mockup_base.set_vertices_bottom_left(ModelViews[2][3][0], ModelViews[2][3][1], ModelViews[2][3][2]);
         }
         if(ModelViews.count(3) > 0) {
             //std::cout << " Bottom Right 3; ";
             //Mockup_base Bottom Right ID=3 detected
-            Mockup_base.set_vertices_bottom_right(ModelViews[3][0][3], ModelViews[3][1][3], ModelViews[3][2][3]);
+            Mockup_base.set_vertices_bottom_right(ModelViews[3][3][0], ModelViews[3][3][1], ModelViews[3][3][2]);
         }
         if(ModelViews.count(4) > 0) {
             //std::cout << "Top Right 4; ";
             //Mockup_base Top Right ID=4 detected
-            Mockup_base.set_vertices_top_right(ModelViews[4][0][3], ModelViews[4][1][3], ModelViews[4][2][3]);
+            Mockup_base.set_vertices_top_right(ModelViews[4][3][0], ModelViews[4][3][1], ModelViews[4][3][2]);
         }
         
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -354,8 +354,9 @@ int main(int argc, char** argv ){
    
         CVOutput.render(cvVideoShader, frame_output);
 
+        Mockup_base.update_vertices();
         colorShader.use();
-        ourShader.setMat4("projection", projection);
+        colorShader.setMat4("projection", projection);
         Mockup_base.render(colorShader);
 
 
