@@ -20,15 +20,16 @@
 #include <filesystem>
 #include <map>
 
-#include "obj.hpp"
-#include "plane_texture.hpp"
-#include "plane.hpp"
 #include "charuco_calibration.hpp"
 #include "aruco_creator.hpp"
 
 #include "shader.hpp"
 #include "mesh.hpp"
 #include "model.hpp"
+
+#include "obj.hpp"
+#include "plane_texture.hpp"
+#include "plane.hpp"
 
 using namespace cv;
 namespace fs = std::filesystem;
@@ -134,12 +135,18 @@ int main(int argc, char** argv ){
     // load models
     // -----------
     float model_scale = markerLength / 10;
-    std::map<int, Model> Models;
+    std::map<int, Model*> Models;
 
-    Models[21].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/house/house.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
-    Models[22].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
-    Models[23].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.4f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
-    Models[24].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.3f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+    Models[5] = new Model();
+    Models[21] = new Model();
+    Models[22] = new Model();
+    Models[23] = new Model();
+    Models[24] = new Model();
+
+    Models[21]->loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/house/house.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+    Models[22]->loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+    Models[23]->loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.4f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+    Models[24]->loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.3f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
     //////////////////////////////
 
     float vertices[40] = {
@@ -278,7 +285,7 @@ int main(int argc, char** argv ){
                 cv::Vec3d r = rvecs[i];
 			    cv::Vec3d t = tvecs[i];
 
-                Models[ids[i]].set_aruco_pose_tvec(t);
+                Models[ids[i]]->set_aruco_pose_tvec(t);
 
             	cv::Mat rot;
 			    Rodrigues(rvecs[i], rot);
@@ -307,7 +314,7 @@ int main(int argc, char** argv ){
                     }
                 }
 
-                Models[ids[i]].set_viewMatrix(view);
+                Models[ids[i]]->set_viewMatrix(view);
             }
         }
         else {
@@ -321,22 +328,22 @@ int main(int argc, char** argv ){
         if(Models.count(1) > 0) {
             //std::cout << " Top Left 1; ";
             //Mockup_base Top Left ID=1 detected
-            Mockup_base.set_vertices_top_left(Models[1].get_viewMatrix());
+            Mockup_base.set_vertices_top_left(Models[1]->get_viewMatrix());
         }
         if(Models.count(2) > 0) {
             //std::cout << " Bottom Left 2; ";
             //Mockup_base Bottom Left ID=2 detected
-            Mockup_base.set_vertices_bottom_left(Models[2].get_viewMatrix());
+            Mockup_base.set_vertices_bottom_left(Models[2]->get_viewMatrix());
         }
         if(Models.count(3) > 0) {
             //std::cout << " Bottom Right 3; ";
             //Mockup_base Bottom Right ID=3 detected
-            Mockup_base.set_vertices_bottom_right(Models[3].get_viewMatrix());
+            Mockup_base.set_vertices_bottom_right(Models[3]->get_viewMatrix());
         }
         if(Models.count(4) > 0) {
             //std::cout << "Top Right 4; ";
             //Mockup_base Top Right ID=4 detected
-            Mockup_base.set_vertices_top_right(Models[4].get_viewMatrix());
+            Mockup_base.set_vertices_top_right(Models[4]->get_viewMatrix());
         }
         
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -352,12 +359,12 @@ int main(int argc, char** argv ){
 
         for(auto i:ids){
             if(i == 1 || i == 2 || i == 3 || i == 4 || i == 5) continue;
-            if(Models.count(5) > 0 && Models[i].has_collision_with(Models[5].get_viewMatrix()))
+            if(Models.count(5) > 0 && Models[i]->has_collision_with(Models[5]->get_viewMatrix()))
                 std::cout << "Hay colision con Modelo "<< i << std::endl;
             ourShader.use();
             //std::cout << Models[i].get_Position_on_Mat()[0] ;
             ourShader.setMat4("projection", projection);
-            Models[i].render(ourShader);
+            Models[i]->render(ourShader);
         }
         
 
