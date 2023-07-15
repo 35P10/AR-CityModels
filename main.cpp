@@ -112,7 +112,8 @@ int main(int argc, char** argv ){
 
     // configure global opengl state
     // -----------------------------
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
 
     // build and compile shaders
     // -------------------------
@@ -143,12 +144,12 @@ int main(int argc, char** argv ){
     Transform[21] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
     Transform[22] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
     Transform[23] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
-    Transform[24] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));    
+    Transform[24] = glm::rotate(glm::scale(glm::mat4(1.0f), glm::vec3(0.2, 0.2, 0.2)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)); 
 
-    Models[21].loadModel("D:/Documents/Projects/ComputerGraphics-FinalProject/resources/objects/house/house.obj");
-    Models[22].loadModel("D:/Documents/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj");
-    Models[23].loadModel("D:/Documents/Projects/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj");
-    Models[24].loadModel("D:/Documents/Projects/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj");
+    Models[21].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/house/house.obj");
+    Models[22].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj");
+    Models[23].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj");
+    Models[24].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj");
     //////////////////////////////
 
     float vertices[40] = {
@@ -215,27 +216,26 @@ int main(int argc, char** argv ){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); /* We will use linear interpolation for minifying filter */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); /* We will use linear interpolation for magnification filter */
     
-    //glMatrixMode(GL_PROJECTION);     // Make a simple 2D projection on the entire window
-    //glLoadIdentity();
-    //glOrtho(0.0, SCR_WIDTH, SCR_HEIGHT, 0.0, 0.0, 100.0);
-
-    //glMatrixMode(GL_MODELVIEW);    // Set the matrix mode to object modeling
-
-
     cv::Mat cameraMatrix, distCoeffs;
     const float markerLength = 10.0f;
-    
-    // Read camera parameters from tutorial_camera_params.yml
-    //readCameraParameters("D:/Documents/Projects/openCV/camera_parameters.yml", cameraMatrix, distCoeffs); // This function is implemented in aruco_samples_utility.hpp
-    // Distortion coeffs (fill in your actual values here).
-    double K_[3][3] =
-    { { 675, 0, 320 },
-    { 0, 675, 240 },
-    { 0, 0, 1 } };
-    cameraMatrix = cv::Mat(3, 3, CV_64F, K_).clone();
 
-    double dist_[] = { 0, 0, 0, 0, 0 };
-    distCoeffs = cv::Mat(5, 1, CV_64F, dist_).clone();
+    bool is_camera_params_def = false;
+    if(is_camera_params_def) {
+        //const string dir_camera_parameters = fs::absolute("resources/camera_parameters.yml").string();
+        //std::cout << "Cargar camera_parameters en: " << dir_camera_parameters.c_str() << std::endl;
+        readCameraParameters("F:/Projects/ComputerGraphics-FinalProject/camera_parameters.yml", cameraMatrix, distCoeffs); // This function is implemented in aruco_samples_utility.hpp
+    }
+    else {
+        double K_[3][3] =
+        { { 675, 0, 320 },
+        { 0, 675, 240 },
+        { 0, 0, 1 } };
+        cameraMatrix = cv::Mat(3, 3, CV_64F, K_).clone();
+
+        double dist_[] = { 0, 0, 0, 0, 0 };
+        distCoeffs = cv::Mat(5, 1, CV_64F, dist_).clone();
+    }
+
     
 
     // Set coordinate system
@@ -244,7 +244,7 @@ int main(int argc, char** argv ){
     objPoints.ptr<cv::Vec3f>(0)[1] = cv::Vec3f(markerLength/2.f, markerLength/2.f, 0);
     objPoints.ptr<cv::Vec3f>(0)[2] = cv::Vec3f(markerLength/2.f, -markerLength/2.f, 0);
     objPoints.ptr<cv::Vec3f>(0)[3] = cv::Vec3f(-markerLength/2.f, -markerLength/2.f, 0);
-
+    
     cv::aruco::DetectorParameters detectorParams = cv::aruco::DetectorParameters();
     cv::aruco::Dictionary dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
     aruco::ArucoDetector detector(dictionary, detectorParams);
@@ -282,7 +282,7 @@ int main(int argc, char** argv ){
             }
             // Draw axis for each marker
             for(unsigned int i = 0; i < ids.size(); i++) {
-                cv::drawFrameAxes(frame_output, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
+                cv::drawFrameAxes(frame_output, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], markerLength/2);
             }
 
             for (size_t i = 0; i < rvecs.size(); ++i) {
@@ -328,14 +328,6 @@ int main(int argc, char** argv ){
         //stbi_set_flip_vertically_on_load(true); // doesnt work!! tell stb_image.h to flip loaded texture's on the y-axis.
         flip(frame_output, frame_output, 0); // flip loaded frame on the y-axis.
 
-        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        //glClearDepth(0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   
-        // Draw texture in GLFW window
-        //glLoadIdentity();
-        //CVOutput.render(cvVideoShader, frame_output);
-
         //std::cout << "Mockup_base: ";
         if(ModelViews.count(1) > 0) {
             //std::cout << " Top Left 1; ";
@@ -361,24 +353,32 @@ int main(int argc, char** argv ){
             ModelViews[3] = projection * ModelViews[4];
             Mockup_base.set_vertices_top_right(ModelViews[4][0][3], ModelViews[4][1][3], ModelViews[4][2][3]);
         }
-        //std::cout << "detected\n";
-        Mockup_base.update_vertices();
-        // draw plane
+        
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   
+        CVOutput.render(cvVideoShader, frame_output);
+
         colorShader.use();
         Mockup_base.render(colorShader);
 
-        // don't forget to enable shader before setting uniforms
+
         for(auto i:ids){
             if(i == 1 || i == 2 || i == 3 || i == 4) continue;
+            
              ourShader.use();
-             // view/projection transformations
              ourShader.setMat4("projection", projection);
              ourShader.setMat4("view", ModelViews[i]);
              ourShader.setMat4("model", Transform[i]);
              Models[i].Draw(ourShader);
         }
+        
 
-        //cubito.render(glm::mat4(1.0f), view, projection);
+        //cubito.render(glm::mat4(1.0f), ModelViews[24], projection);
+
+        
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

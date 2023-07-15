@@ -31,7 +31,7 @@ public:
         //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
     void render(Shader shader, cv::Mat frame_output) {
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         //glActiveTexture(GL_TEXTURE0);
         
         //glMatrixMode(GL_MODELVIEW);     
