@@ -30,6 +30,7 @@
 #include "obj.hpp"
 #include "plane_texture.hpp"
 #include "plane.hpp"
+#include "interactor.hpp"
 
 using namespace cv;
 namespace fs = std::filesystem;
@@ -137,6 +138,10 @@ int main(int argc, char** argv ){
     float model_scale = markerLength / 10;
     std::map<int, Model*> Models;
 
+    Models[1] = new Model();
+    Models[2] = new Model();
+    Models[3] = new Model();
+    Models[4] = new Model();
     Models[5] = new Model();
     Models[21] = new Model();
     Models[22] = new Model();
@@ -147,6 +152,8 @@ int main(int argc, char** argv ){
     Models[22]->loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
     Models[23]->loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.4f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
     Models[24]->loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.3f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+    
+    Interactor myInteractor(5, Models[5]);
     //////////////////////////////
 
     float vertices[40] = {
@@ -248,7 +255,7 @@ int main(int argc, char** argv ){
     Plane_texture CVOutput;
     Plane Mockup_base;
     
-
+    
     while(!glfwWindowShouldClose(window))
     {
         // input
@@ -277,6 +284,10 @@ int main(int argc, char** argv ){
             // Draw axis for each marker
             for(unsigned int i = 0; i < ids.size(); i++) {
                 cv::drawFrameAxes(frame_output, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], markerLength/2);
+                if(ids[i] == myInteractor.get_selector_id()){
+                    std:: cout << "Interactor: Selector encontrado" << std::endl;
+                    myInteractor.set_selectorMarkerDetected(true);
+                }
             }
 
             for (size_t i = 0; i < rvecs.size(); ++i) {
@@ -359,13 +370,19 @@ int main(int argc, char** argv ){
 
         for(auto i:ids){
             if(i == 1 || i == 2 || i == 3 || i == 4 || i == 5) continue;
-            if(Models.count(5) > 0 && Models[i]->has_collision_with(Models[5]->get_viewMatrix()))
+            if(myInteractor.isDetected() > 0 && Models[i]->has_collision_with(myInteractor.get_viewMatrix_selector())) {
                 std::cout << "Hay colision con Modelo "<< i << std::endl;
+                std:: cout << "Collision:" << Models[i]->get_Position_on_Mat()[0] << std::endl;
+                myInteractor.set_modelCopy(Models[i]);
+            }
             ourShader.use();
-            //std::cout << Models[i].get_Position_on_Mat()[0] ;
             ourShader.setMat4("projection", projection);
             Models[i]->render(ourShader);
         }
+
+        ourShader.use();
+        ourShader.setMat4("projection", projection);
+        myInteractor.render(ourShader);
         
 
         //cubito.render(glm::mat4(1.0f), ModelViews[24], projection);
