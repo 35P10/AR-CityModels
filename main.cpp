@@ -38,8 +38,8 @@ void processInput(GLFWwindow *window);
 void create_chArucoBoard();
 
 // settings
-const unsigned int SCR_WIDTH = 640;
-const unsigned int SCR_HEIGHT = 480;
+const unsigned int SCR_WIDTH = 512;
+const unsigned int SCR_HEIGHT = 512;
 
 const char* vertexShaderSourceModel = "#version 330 core\n"
     "layout(location = 0) in vec3 aPos;\n"
@@ -114,7 +114,7 @@ int main(int argc, char** argv ){
     // -----------------------------
     //glEnable(GL_DEPTH_TEST);
     glDisable(GL_DEPTH_TEST);
-
+    const float markerLength = 0.05f;
     // build and compile shaders
     // -------------------------
     const string vertex_shader_model = fs::absolute("resources/shader/vertex_shader_model.vs").string();
@@ -140,11 +140,11 @@ int main(int argc, char** argv ){
     std::map<int,glm::mat4> ModelViews;
     std::map<int,glm::mat4> Transform;
 
-
-    Transform[21] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
-    Transform[22] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
-    Transform[23] = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
-    Transform[24] = glm::rotate(glm::scale(glm::mat4(1.0f), glm::vec3(0.2, 0.2, 0.2)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)); 
+    float model_scale = markerLength / 10;
+    Transform[21] = glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
+    Transform[22] = glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
+    Transform[23] = glm::rotate(glm::scale(glm::mat4(1.0f), 0.4f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
+    Transform[24] = glm::rotate(glm::scale(glm::mat4(1.0f), 0.3f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)); 
 
     Models[21].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/house/house.obj");
     Models[22].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj");
@@ -193,8 +193,8 @@ int main(int argc, char** argv ){
     glm::mat4 projection = glm::mat4(1.0f);
     
     float fov = 53.13f;
-    float nearp = 0.1f;
-    float farp = 20.0f;
+    float nearp = 0.001f;
+    float farp = 1000.0f;
     float ratio = (1.0f * SCR_WIDTH) / SCR_HEIGHT;
     float f = 1.0f / tan(fov * (M_PI / 360.0f));
     projection[0][0] = f / ratio;
@@ -203,7 +203,6 @@ int main(int argc, char** argv ){
 	projection[3][2] = (2.0f * farp * nearp) / (nearp - farp);
 	projection[2][3] = -1.0f;
 	projection[3][3] = 0.0f;
-
 
     cv::VideoCapture inputVideo(0);
     
@@ -217,8 +216,6 @@ int main(int argc, char** argv ){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); /* We will use linear interpolation for magnification filter */
     
     cv::Mat cameraMatrix, distCoeffs;
-    const float markerLength = 10.0f;
-
     bool is_camera_params_def = false;
     if(is_camera_params_def) {
         //const string dir_camera_parameters = fs::absolute("resources/camera_parameters.yml").string();
@@ -332,25 +329,21 @@ int main(int argc, char** argv ){
         if(ModelViews.count(1) > 0) {
             //std::cout << " Top Left 1; ";
             //Mockup_base Top Left ID=1 detected
-            ModelViews[1] = projection * ModelViews[1];
             Mockup_base.set_vertices_top_left(ModelViews[1][0][3], ModelViews[1][1][3], ModelViews[1][2][3]);
         }
         if(ModelViews.count(2) > 0) {
             //std::cout << " Bottom Left 2; ";
             //Mockup_base Bottom Left ID=2 detected
-            ModelViews[2] = projection * ModelViews[2];
             Mockup_base.set_vertices_bottom_left(ModelViews[2][0][3], ModelViews[2][1][3], ModelViews[2][2][3]);
         }
         if(ModelViews.count(3) > 0) {
             //std::cout << " Bottom Right 3; ";
             //Mockup_base Bottom Right ID=3 detected
-            ModelViews[3] = projection * ModelViews[3];
             Mockup_base.set_vertices_bottom_right(ModelViews[3][0][3], ModelViews[3][1][3], ModelViews[3][2][3]);
         }
         if(ModelViews.count(4) > 0) {
             //std::cout << "Top Right 4; ";
             //Mockup_base Top Right ID=4 detected
-            ModelViews[3] = projection * ModelViews[4];
             Mockup_base.set_vertices_top_right(ModelViews[4][0][3], ModelViews[4][1][3], ModelViews[4][2][3]);
         }
         
@@ -362,6 +355,7 @@ int main(int argc, char** argv ){
         CVOutput.render(cvVideoShader, frame_output);
 
         colorShader.use();
+        ourShader.setMat4("projection", projection);
         Mockup_base.render(colorShader);
 
 
