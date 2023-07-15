@@ -133,23 +133,13 @@ int main(int argc, char** argv ){
     Shader colorShader(vertex_shader_no_texture.c_str(), fragment_shader_no_texture.c_str());
     // load models
     // -----------
-    //const string backpack_model = fs::absolute("resources/objects/backpack/backpack.obj").string();
-    //std::cout << "Cargar backpack model en: " << backpack_model.c_str() << std::endl;
-
-    std::map<int, Model> Models;
-    std::map<int,glm::mat4> ModelViews;
-    std::map<int,glm::mat4> Transform;
-
     float model_scale = markerLength / 10;
-    Transform[21] = glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
-    Transform[22] = glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
-    Transform[23] = glm::rotate(glm::scale(glm::mat4(1.0f), 0.4f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
-    Transform[24] = glm::rotate(glm::scale(glm::mat4(1.0f), 0.3f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)); 
+    std::map<int, Model> Models;
 
-    Models[21].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/house/house.obj");
-    Models[22].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj");
-    Models[23].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj");
-    Models[24].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj");
+    Models[21].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/house/house.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+    Models[22].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+    Models[23].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.4f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+    Models[24].loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.3f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
     //////////////////////////////
 
     float vertices[40] = {
@@ -288,6 +278,8 @@ int main(int argc, char** argv ){
                 cv::Vec3d r = rvecs[i];
 			    cv::Vec3d t = tvecs[i];
 
+                Models[ids[i]].set_aruco_pose_tvec(t);
+
             	cv::Mat rot;
 			    Rodrigues(rvecs[i], rot);
                 for (unsigned int row = 0; row < 3; ++row){
@@ -315,7 +307,7 @@ int main(int argc, char** argv ){
                     }
                 }
 
-                ModelViews[ids[i]] = view;
+                Models[ids[i]].set_viewMatrix(view);
             }
         }
         else {
@@ -326,30 +318,28 @@ int main(int argc, char** argv ){
         flip(frame_output, frame_output, 0); // flip loaded frame on the y-axis.
 
         //std::cout << "Mockup_base: ";
-        if(ModelViews.count(1) > 0) {
+        if(Models.count(1) > 0) {
             //std::cout << " Top Left 1; ";
             //Mockup_base Top Left ID=1 detected
-            Mockup_base.set_vertices_top_left(ModelViews[1][3][0], ModelViews[1][3][1], ModelViews[1][3][2]);
+            Mockup_base.set_vertices_top_left(Models[1].get_viewMatrix());
         }
-        if(ModelViews.count(2) > 0) {
+        if(Models.count(2) > 0) {
             //std::cout << " Bottom Left 2; ";
             //Mockup_base Bottom Left ID=2 detected
-            Mockup_base.set_vertices_bottom_left(ModelViews[2][3][0], ModelViews[2][3][1], ModelViews[2][3][2]);
+            Mockup_base.set_vertices_bottom_left(Models[2].get_viewMatrix());
         }
-        if(ModelViews.count(3) > 0) {
+        if(Models.count(3) > 0) {
             //std::cout << " Bottom Right 3; ";
             //Mockup_base Bottom Right ID=3 detected
-            Mockup_base.set_vertices_bottom_right(ModelViews[3][3][0], ModelViews[3][3][1], ModelViews[3][3][2]);
+            Mockup_base.set_vertices_bottom_right(Models[3].get_viewMatrix());
         }
-        if(ModelViews.count(4) > 0) {
+        if(Models.count(4) > 0) {
             //std::cout << "Top Right 4; ";
             //Mockup_base Top Right ID=4 detected
-            Mockup_base.set_vertices_top_right(ModelViews[4][3][0], ModelViews[4][3][1], ModelViews[4][3][2]);
+            Mockup_base.set_vertices_top_right(Models[4].get_viewMatrix());
         }
         
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-
-        
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    
         CVOutput.render(cvVideoShader, frame_output);
@@ -362,12 +352,10 @@ int main(int argc, char** argv ){
 
         for(auto i:ids){
             if(i == 1 || i == 2 || i == 3 || i == 4) continue;
-            
-             ourShader.use();
-             ourShader.setMat4("projection", projection);
-             ourShader.setMat4("view", ModelViews[i]);
-             ourShader.setMat4("model", Transform[i]);
-             Models[i].Draw(ourShader);
+        
+            ourShader.use();
+            ourShader.setMat4("projection", projection);
+            Models[i].render(ourShader);
         }
         
 

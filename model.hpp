@@ -33,6 +33,22 @@ public:
     vector<Mesh>    meshes;
     string directory;
     bool gammaCorrection;
+    glm::mat4 Transform = glm::mat4(1.0f);
+    glm::mat4 View = glm::mat4(1.0f);
+    cv::Vec3d ArucoTVec;
+
+    void set_aruco_pose_tvec(cv::Vec3d t){
+        ArucoTVec = t;
+    }
+
+    void set_viewMatrix(glm::mat4 viewMAtrix){
+        View = viewMAtrix;
+    }
+
+    glm::mat4 get_viewMatrix(){
+        return View;
+    }
+
 
     // constructor, expects a filepath to a 3D model.
     Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
@@ -44,6 +60,12 @@ public:
         ;
     }
 
+    void render(Shader &shader){
+        shader.setMat4("view", View);
+        shader.setMat4("model", Transform);
+        this->Draw(shader);
+    }
+
     // draws the model, and thus all its meshes
     void Draw(Shader &shader)
     {
@@ -52,8 +74,9 @@ public:
     }
     
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
-    void loadModel(string const &path)
+    void loadModel(string const &path, glm::mat4 transform = glm::mat4(1.0f))
     {
+        Transform = transform;
         // read file via ASSIMP
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);

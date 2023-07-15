@@ -42,34 +42,36 @@ public:
         glBindVertexArray(0);
     }
 
-    void set_vertices_top_right(float x, float y, float z) {
-        vertices2[0] = x ;
-        vertices2[1] = y ;
-        vertices2[2] = z ; 
+    //nota: Reducir mas adelante a una funcion!!
+
+    void set_vertices_top_right(glm::mat4 view) {
+        vertices2[0] = view[3][0];
+        vertices2[1] = view[3][1];
+        vertices2[2] = view[3][2];
 
         isVertexUpdated = true;
     }
 
-    void set_vertices_bottom_right(float x, float y, float z) {
-        vertices2[6] = x ;
-        vertices2[7] = y ;
-        vertices2[8] = z ; 
+    void set_vertices_bottom_right(glm::mat4 view) {
+        vertices2[6] = view[3][0];
+        vertices2[7] = view[3][1];
+        vertices2[8] = view[3][2]; 
 
         isVertexUpdated = true;
     }
 
-    void set_vertices_bottom_left(float x, float y, float z) {
-        vertices2[12] = x ;
-        vertices2[13] = y ;
-        vertices2[14] = z ; 
+    void set_vertices_bottom_left(glm::mat4 view) {
+        vertices2[12] = view[3][0];
+        vertices2[13] = view[3][1];
+        vertices2[14] = view[3][2]; 
 
         isVertexUpdated = true;
     }
 
-    void set_vertices_top_left(float x, float y, float z) {
-        vertices2[18] = x ;
-        vertices2[19] = y ;
-        vertices2[20] = z ; 
+    void set_vertices_top_left(glm::mat4 view) {
+        vertices2[18] = view[3][0];
+        vertices2[19] = view[3][1];
+        vertices2[20] = view[3][2];
 
         isVertexUpdated = true;
     }
