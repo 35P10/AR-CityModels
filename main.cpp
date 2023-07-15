@@ -351,9 +351,11 @@ int main(int argc, char** argv ){
 
 
         for(auto i:ids){
-            if(i == 1 || i == 2 || i == 3 || i == 4) continue;
-        
+            if(i == 1 || i == 2 || i == 3 || i == 4 || i == 5) continue;
+            if(Models.count(5) > 0 && Models[i].has_collision_with(Models[5].get_viewMatrix()))
+                std::cout << "Hay colision con Modelo "<< i << std::endl;
             ourShader.use();
+            //std::cout << Models[i].get_Position_on_Mat()[0] ;
             ourShader.setMat4("projection", projection);
             Models[i].render(ourShader);
         }

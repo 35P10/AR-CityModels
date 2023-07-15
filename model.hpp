@@ -28,6 +28,7 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
 class Model 
 {
 public:
+    float range_Colission = 0.2f; 
     // model data 
     vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
     vector<Mesh>    meshes;
@@ -48,6 +49,27 @@ public:
     glm::mat4 get_viewMatrix(){
         return View;
     }
+
+    bool has_collision_with(glm::mat4 object) {
+        cv::Vec3d centre = get_Position_on_Mat();
+        cv::Vec3d object_centre = get_Position_on_Mat(object);
+        // check in x range
+        if(abs(object_centre[0] - centre[0]) > range_Colission) return false;
+
+        if(abs(object_centre[1] - centre[1]) > range_Colission) return false;
+
+        if(abs(object_centre[2] - centre[2]) > range_Colission) return false;
+
+        return true;
+    }
+
+    cv::Vec3d get_Position_on_Mat(glm::mat4 input){
+        return cv::Vec3d(input[3][0], input[3][1], input[3][2]);
+    }
+
+    cv::Vec3d get_Position_on_Mat(){
+        return get_Position_on_Mat(View);
+    } 
 
 
     // constructor, expects a filepath to a 3D model.
