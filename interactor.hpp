@@ -13,6 +13,8 @@ class Interactor {
     bool isMarkerDetected = false;
 
 public:
+
+    Interactor() {};
     Interactor(int selectorID, Model* &selector) {
         Selector = selector;
         Selector_ID = selectorID;
