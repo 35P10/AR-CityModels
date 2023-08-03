@@ -11,7 +11,8 @@ create_marker(ID,"markerID.png");
 
 ## Notas
 
-* Definir el path de backpack model
+* Cambiar path de modelos en  ```\augmented_mockup.hpp```
+* [Calibrar camara](https://github.com/opencv/opencv_contrib/blob/4.x/modules/aruco/samples/calibrate_camera_charuco.cpp)
 
 ## Resources
 Models by: Marc-Mons in [turbosquid](https://www.turbosquid.com/es/Search/Artists/Marc-Mons)
