@@ -38,15 +38,21 @@ namespace fs = std::filesystem;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
-void create_chArucoBoard();
+void create_chArucoBoard(void);
 
+int options = 1;
 
 int main(int argc, char** argv ){
- // glfw: initialize and configure
+
+    if (options == 0) {
+        create_chArucoBoard();
+        return 0;
+    }
+    
+    // glfw: initialize and configure
     // ------------------------------
     glfwInit();
     
-
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
@@ -58,13 +64,13 @@ int main(int argc, char** argv ){
     }
 
     cv::VideoCapture inputVideo(0);
-    const double VideoCaptureWidth = inputVideo.get(cv::CAP_PROP_FRAME_WIDTH);
-    const double VideoCaptureHeight = inputVideo.get(cv::CAP_PROP_FRAME_HEIGHT);
+    const int VideoCaptureWidth = inputVideo.get(cv::CAP_PROP_FRAME_WIDTH);
+    const int VideoCaptureHeight = inputVideo.get(cv::CAP_PROP_FRAME_HEIGHT);
     std::cout << "Resolucion de la camara: " << VideoCaptureWidth << "x" << VideoCaptureHeight << std::endl;    
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(512, 512, "GLFW 512x512", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(VideoCaptureWidth, VideoCaptureHeight, "GLFW Original", NULL, NULL);
     if(!window){
         std::cout << "Error al crear la ventana GLFW" << std::endl;
         glfwTerminate();
@@ -84,50 +90,10 @@ int main(int argc, char** argv ){
         return -1;
     }  
 
-    ArucoMockup test1(512,512);
-
-
-    GLFWwindow* window2 = glfwCreateWindow(400, 300, "GLFW 400x300", NULL, NULL);
-    if(!window2){
-        std::cout << "Error al crear la ventana GLFW" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        glfwTerminate();
-        return -1;
-    }  
-   
-    glfwMakeContextCurrent(window2);
-    glfwSetFramebufferSizeCallback(window2, framebuffer_size_callback);
-
-     ArucoMockup test2(400,300);
-
-
-    GLFWwindow* window3 = glfwCreateWindow(VideoCaptureWidth, VideoCaptureHeight, "GLFW Original", NULL, NULL);
-    if(!window3){
-        std::cout << "Error al crear la ventana GLFW" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        glfwTerminate();
-        return -1;
-    }  
-   
-    glfwMakeContextCurrent(window3);
-    glfwSetFramebufferSizeCallback(window3, framebuffer_size_callback);
-    
-    
-    ArucoMockup test3(VideoCaptureWidth,VideoCaptureHeight);
+    ArucoMockup test1(VideoCaptureWidth,VideoCaptureHeight,0.8f);
 
     cv::Mat cameraMatrix, distCoeffs;
+
     bool is_camera_params_def = false;
     if(is_camera_params_def) {
         //const string dir_camera_parameters = fs::absolute("resources/camera_parameters.yml").string();
@@ -150,44 +116,19 @@ int main(int argc, char** argv ){
     aruco::ArucoDetector detector(dictionary, detectorParams);
 
     cv::Mat frame_input;
-    cv::Mat resizedImage0, resizedImage1, resizedImage2;
     
-    while (true){
+    while (!glfwWindowShouldClose(window)) {
         // Capturar un fotograma del flujo de video
         if (!inputVideo.retrieve(frame_input))
             break;
 
         glfwMakeContextCurrent(window);
 
-         cv::resize(frame_input, resizedImage1, cv::Size(512, 512), 0, 0, cv::INTER_CUBIC);
-        test1.render(resizedImage1, detector, cameraMatrix, distCoeffs);   
-        cv::imshow("OpenCV 512x512", resizedImage1);
+        //cv::resize(frame_input, frame_input, cv::Size(512, 512), 0, 0, cv::INTER_CUBIC);
+        test1.render(frame_input, detector, cameraMatrix, distCoeffs);   
 
         glfwSwapBuffers(window);
         glfwPollEvents();  
-
-        glfwMakeContextCurrent(window2);
-
-        cv::resize(frame_input, resizedImage0, cv::Size(400, 300), 0, 0, cv::INTER_CUBIC);
-        test2.render(resizedImage0, detector, cameraMatrix, distCoeffs);
-        cv::imshow("OpenCV 400x300", resizedImage0);
-    
-
-        glfwSwapBuffers(window2);
-        glfwPollEvents(); 
-
-        glfwMakeContextCurrent(window3);
-
-        test2.render(frame_input, detector, cameraMatrix, distCoeffs);
-        cv::imshow("OpenCV Original", frame_input);
-
-        glfwSwapBuffers(window3);
-        glfwPollEvents();   
-
-          // Esperar 30 milisegundos y salir del bucle si el usuario presiona la tecla 'q'
-        if (cv::waitKey(30) == 'q')
-            break;
-
     }
 
     inputVideo.release();

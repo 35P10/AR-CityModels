@@ -36,6 +36,10 @@ public:
     bool gammaCorrection;
     glm::mat4 Transform = glm::mat4(1.0f);
     glm::mat4 View = glm::mat4(1.0f);
+    glm::mat4 ViewMatrixavg = glm::mat4(1.0f);
+    cv::Mat View1 = cv::Mat::zeros(4, 4, CV_32F);
+    cv::Mat View2 = cv::Mat::zeros(4, 4, CV_32F);
+    cv::Mat View0 = cv::Mat::zeros(4, 4, CV_32F);
     cv::Vec3d ArucoTVec;
 
     void set_aruco_pose_tvec(cv::Vec3d t){
@@ -83,7 +87,7 @@ public:
     }
 
     void render(Shader &shader){
-        shader.setMat4("view", View);
+        shader.setMat4("view", ViewMatrixavg);
         shader.setMat4("model", Transform);
         this->Draw(shader);
     }

@@ -29,8 +29,8 @@ namespace fs = std::filesystem;
 
 class ArucoMockup {
 public:
-    int SCR_WIDTH = 512;
-    int SCR_HEIGHT = 512;
+    int SCR_WIDTH;
+    int SCR_HEIGHT;
     float markerLength = 1.75f;
     float model_scale;
     glm::mat4 model = glm::mat4(1.0f);
@@ -96,11 +96,11 @@ public:
         Models[22] = new Model();
         Models[23] = new Model();
         Models[24] = new Model();
-
-        Models[21]->loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/house/house.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
-        Models[22]->loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
-        Models[23]->loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.4f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
-        Models[24]->loadModel("F:/Projects/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.3f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+        
+        Models[21]->loadModel("D:/ComputerGraphics-FinalProject/resources/objects/house/house.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+        Models[22]->loadModel("D:/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+        Models[23]->loadModel("D:/Projects/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.4f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+        Models[24]->loadModel("D:/Projects/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.3f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
         
         myInteractor = Interactor(5, Models[5]);
         
@@ -186,15 +186,41 @@ public:
 
                     viewMatrix = cvToGl * viewMatrix;
                     cv::transpose(viewMatrix, viewMatrix);
+
+
+                    bool flipped = false;
                     
+
+                    for (int jj = 0; jj < 4; jj++) {
+                        for (int yy = 0; yy < 4; yy++) {
+                            viewMatrixavg.at<float>(jj, yy) = (viewMatrix.at<float>(jj, yy) + Models[ids[i]]->View1.at<float>(jj, yy) + Models[ids[i]]->View2.at<float>(jj, yy)) / 3;
+                        }
+                    }
+
+
                     // CV to GL
                     for (int i = 0; i < 4; i++) {
                         for (int j = 0; j < 4; j++) {
                             view[i][j] = viewMatrix.at<float>(i, j);
                         }
                     }
-
                     Models[ids[i]]->set_viewMatrix(view);
+
+                    for (int i = 0; i < 4; i++) {
+                        for (int j = 0; j < 4; j++) {
+                            view[i][j] = viewMatrixavg.at<float>(i, j);
+                        }
+                    }
+                    view[0][3] = 0;
+                    view[1][3] = 0;
+                    view[2][3] = 0;
+                    view[3][3] = 1;
+                    Models[ids[i]]->ViewMatrixavg = view;
+
+
+                    Models[ids[i]]->View0 = viewMatrixavg;
+					Models[ids[i]]->View2 = Models[ids[i]]->View1;
+					Models[ids[i]]->View1 = viewMatrix;
                 }
             }
             else {
