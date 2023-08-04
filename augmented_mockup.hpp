@@ -98,9 +98,9 @@ public:
         Models[24] = new Model();
         
         Models[21]->loadModel("D:/ComputerGraphics-FinalProject/resources/objects/house/house.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
-        Models[22]->loadModel("D:/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
-        Models[23]->loadModel("D:/Projects/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.4f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
-        Models[24]->loadModel("D:/Projects/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.3f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+        Models[22]->loadModel("D:/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+        Models[23]->loadModel("D:/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.4f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+        Models[24]->loadModel("D:/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.3f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
         
         myInteractor = Interactor(5, Models[5]);
         
@@ -233,22 +233,22 @@ public:
             if(Models.count(1) > 0) {
                 //std::cout << " Top Left 1; ";
                 //Mockup_base Top Left ID=1 detected
-                Mockup_base.set_vertices_top_left(Models[1]->get_viewMatrix());
+                Mockup_base.set_vertices_top(Models[1]->get_viewMatrix());
             }
             if(Models.count(2) > 0) {
                 //std::cout << " Bottom Left 2; ";
                 //Mockup_base Bottom Left ID=2 detected
-                Mockup_base.set_vertices_bottom_left(Models[2]->get_viewMatrix());
+                Mockup_base.set_vertices_left(Models[2]->get_viewMatrix());
             }
             if(Models.count(3) > 0) {
                 //std::cout << " Bottom Right 3; ";
                 //Mockup_base Bottom Right ID=3 detected
-                Mockup_base.set_vertices_bottom_right(Models[3]->get_viewMatrix());
+                Mockup_base.set_vertices_bottom(Models[3]->get_viewMatrix());
             }
             if(Models.count(4) > 0) {
                 //std::cout << "Top Right 4; ";
                 //Mockup_base Top Right ID=4 detected
-                Mockup_base.set_vertices_top_right(Models[4]->get_viewMatrix());
+                Mockup_base.set_vertices_right(Models[4]->get_viewMatrix());
             }
             
             glClearColor(0.5f, 0.5f, 0.5f, 1.0f);

@@ -94,7 +94,7 @@ int main(int argc, char** argv ){
 
     cv::Mat cameraMatrix, distCoeffs;
 
-    bool is_camera_params_def = false;
+    bool is_camera_params_def = true;
     if(is_camera_params_def) {
         //const string dir_camera_parameters = fs::absolute("resources/camera_parameters.yml").string();
         //std::cout << "Cargar camera_parameters en: " << dir_camera_parameters.c_str() << std::endl;
@@ -115,7 +115,7 @@ int main(int argc, char** argv ){
     cv::aruco::Dictionary dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
     aruco::ArucoDetector detector(dictionary, detectorParams);
 
-    cv::Mat frame_input;
+    cv::Mat frame_input,copy;
     
     while (!glfwWindowShouldClose(window)) {
         // Capturar un fotograma del flujo de video
@@ -123,7 +123,8 @@ int main(int argc, char** argv ){
             break;
 
         glfwMakeContextCurrent(window);
-
+        //undistort(frame_input, copy, cameraMatrix, distCoeffs);
+        //cv::imshow("xd",copy);
         //cv::resize(frame_input, frame_input, cv::Size(512, 512), 0, 0, cv::INTER_CUBIC);
         test1.render(frame_input, detector, cameraMatrix, distCoeffs);   
 

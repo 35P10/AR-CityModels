@@ -44,34 +44,58 @@ public:
 
     //nota: Reducir mas adelante a una funcion!!
 
-    void set_vertices_top_right(glm::mat4 view) {
-        vertices2[0] = view[3][0];
+    void set_vertices_top(glm::mat4 view) {
+        // top - right
+        //vertices2[0] = view[3][0];
         vertices2[1] = view[3][1];
         vertices2[2] = view[3][2];
 
+        // top - left
+        //vertices2[18] = view[3][0];
+        vertices2[19] = view[3][1];
+        vertices2[20] = view[3][2];
+
         isVertexUpdated = true;
     }
 
-    void set_vertices_bottom_right(glm::mat4 view) {
-        vertices2[6] = view[3][0];
+    void set_vertices_bottom(glm::mat4 view) {
+        // bottom - right
+        //vertices2[6] = view[3][0];
         vertices2[7] = view[3][1];
         vertices2[8] = view[3][2]; 
 
-        isVertexUpdated = true;
-    }
-
-    void set_vertices_bottom_left(glm::mat4 view) {
-        vertices2[12] = view[3][0];
+        // bottom - left
+        //vertices2[12] = view[3][0];
         vertices2[13] = view[3][1];
         vertices2[14] = view[3][2]; 
 
         isVertexUpdated = true;
     }
 
-    void set_vertices_top_left(glm::mat4 view) {
+    void set_vertices_left(glm::mat4 view) {
+        // top - left
         vertices2[18] = view[3][0];
-        vertices2[19] = view[3][1];
-        vertices2[20] = view[3][2];
+        //vertices2[19] = view[3][1];
+        //vertices2[20] = view[3][2];
+
+        // bottom - left
+        vertices2[12] = view[3][0];
+        //vertices2[13] = view[3][1];
+        //vertices2[14] = view[3][2]; 
+
+        isVertexUpdated = true;
+    }
+
+    void set_vertices_right(glm::mat4 view) {
+        // top - right
+        vertices2[0] = view[3][0];
+        //vertices2[1] = view[3][1];
+        //vertices2[2] = view[3][2];
+
+        // bottom - right
+        vertices2[6] = view[3][0];
+        //vertices2[7] = view[3][1];
+        //vertices2[8] = view[3][2]; 
 
         isVertexUpdated = true;
     }
