@@ -47,11 +47,11 @@ public:
     }
 
     void set_viewMatrix(glm::mat4 viewMAtrix){
-        View = viewMAtrix;
+        ViewMatrixavg = viewMAtrix;
     }
 
     glm::mat4 get_viewMatrix(){
-        return View;
+        return ViewMatrixavg;
     }
 
     bool has_collision_with(glm::mat4 object) {
@@ -72,7 +72,7 @@ public:
     }
 
     cv::Vec3d get_Position_on_Mat(){
-        return get_Position_on_Mat(View);
+        return get_Position_on_Mat(ViewMatrixavg);
     } 
 
 
