@@ -96,9 +96,9 @@ int main(int argc, char** argv ){
 
     bool is_camera_params_def = true;
     if(is_camera_params_def) {
-        //const string dir_camera_parameters = fs::absolute("resources/camera_parameters.yml").string();
-        //std::cout << "Cargar camera_parameters en: " << dir_camera_parameters.c_str() << std::endl;
-        readCameraParameters("F:/Projects/ComputerGraphics-FinalProject/camera_parameters.yml", cameraMatrix, distCoeffs); // This function is implemented in aruco_samples_utility.hpp
+        const string dir_camera_parameters = fs::absolute("resources/camera_parameters/villanueva_parametros.yml").string();
+        std::cout << "Cargar camera_parameters en: " << dir_camera_parameters.c_str() << std::endl;
+        readCameraParameters(dir_camera_parameters, cameraMatrix, distCoeffs); // This function is implemented in aruco_samples_utility.hpp
     }
     else {
         double K_[3][3] =

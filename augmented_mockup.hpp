@@ -81,6 +81,8 @@ public:
         ourShader = Shader(vertex_shader_model.c_str(), fragment_shader_model.c_str());
         cvVideoShader= Shader(vertex_shader_texture.c_str(), fragment_shader_texture.c_str());
         colorShader= Shader(vertex_shader_no_texture.c_str(), fragment_shader_no_texture.c_str());
+        const string model_house = fs::absolute("resources/objects/house/house.obj").string();
+        std::cout << "Cargar modelo House en: " << model_house.c_str() << std::endl;
 
         // load aruco
         // -----------

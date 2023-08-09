@@ -87,6 +87,8 @@ file(GLOB SHADERS
 
 file(GLOB DLLS "dlls/*.dll")
 
+file(GLOB YMLS "resources/camera_parameters/*.yml")
+
 file(GLOB OBJ_DIR LIST_DIRECTORIES true "resources/objects/*")
 foreach(OBJ_DIR ${OBJ_DIR})
 	message("Carpetas OBJ: ${OBJ_DIR}")
@@ -99,15 +101,42 @@ foreach(OBJ_DIR ${OBJ_DIR})
 				"${OBJ_DIR}/*.png"
 				"${OBJ_DIR}/*.txt"
 	)
+
 	foreach(OBJ_FILE ${OBJ_FILE})
 		message("Archivo OBJ: ${OBJ_FILE}")
 		file(COPY ${OBJ_FILE} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/resources/objects/${DIR_NAME})
 	endforeach()
+
+	file(GLOB DIR_TEXTURES LIST_DIRECTORIES true "resources/objects/${DIR_NAME}/*")
+	list(FILTER DIR_TEXTURES EXCLUDE REGEX ".*\\..*")
+	message("DIR_TEXTURES texturas: ${DIR_TEXTURES}")
+
+	foreach(DIR_PATH ${DIR_TEXTURES})
+		get_filename_component(DIR_NAME_ONLY ${DIR_PATH} NAME)
+		message("Directorio encontrado: ${DIR_NAME_ONLY}")
+		file(GLOB OBJ_FILE 
+				"${DIR_TEXTURES}/*.jpg"
+				"${DIR_TEXTURES}/*.png"
+				"${DIR_TEXTURES}/*.txt"
+		)
+
+		foreach(OBJ_FILE ${OBJ_FILE})
+			message("Archivo Textura: ${OBJ_FILE}")
+			file(COPY ${OBJ_FILE} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/resources/objects/${DIR_NAME}/${DIR_NAME_ONLY})
+		endforeach()
+
+	endforeach()
+
 endforeach()
 
 foreach(DLL ${DLLS})
   message("Archivo DLL: ${DLL}")
   file(COPY ${DLLS} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG})
+endforeach()
+
+foreach(YML ${YMLS})
+  message("Archivo YML: ${YML}")
+  file(COPY ${YMLS} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/resources/camera_parameters)
 endforeach()
 
 foreach(SHADERS ${SHADERS})
