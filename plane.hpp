@@ -37,21 +37,24 @@ public:
         isVertexUpdated = false;
     }
 
-    void render(Shader shader, Shader shader_Models) {
+    void render(Shader shader) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         shader.use();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+    }
 
-        shader_Models.use();
+    void render_models(Shader shader) {
+        shader.use();
         for(auto model:Models) {
            model.render(shader); 
         }
     }
 
-    void add_model(Model copy) {
-        Models.push_back(copy);
+    void add_model(Model Copy, glm::mat4 viewMatrix) {
+        Copy.set_viewMatrix(viewMatrix);
+        Models.push_back(Copy);
     }
 
     bool has_collision_with(glm::mat4 object) {
@@ -68,6 +71,15 @@ public:
 
         return true;
     }
+
+    void has_collision_with_models(glm::mat4 object) {
+        for(int i = 0 ; i < Models.size() ; i++) {
+            if(Models[i].has_collision_with(object)) {
+                Models.erase(Models.begin() + i);
+            } 
+        }
+    }
+    
 
     cv::Vec3d get_Position_on_Mat(glm::mat4 input){
         return cv::Vec3d(input[3][0], input[3][1], input[3][2]);
