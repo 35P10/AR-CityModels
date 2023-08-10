@@ -72,11 +72,9 @@ public:
     }
 
     void render(Shader &shader) {
+        reactorMarkerDetected = false;
+
         if(!isMarkerDetected || !hasCopy) return;
-        // reactor detectado y modelo
-        if(reactorMarkerDetected) {
-            hasCopy = false;
-        }
         // selector detectado y modelo
         if(selectorMarkerDetected) {
             Copy.set_viewMatrix(Selector->get_viewMatrix());        
@@ -84,12 +82,19 @@ public:
             std::cout << "Renderizando Modelo\n";
         }
         isMarkerDetected = false;
-        reactorMarkerDetected = false;
         selectorMarkerDetected = false;
+    }
+
+    void set_hasCopy(bool val) {
+        hasCopy = val;
     }
 
     glm::mat4 get_viewMatrix_selector(){
         return Selector->get_viewMatrix();
+    }
+
+    glm::mat4 get_viewMatrix_reactor(){
+        return Reactor->get_viewMatrix();
     }
         
 private:

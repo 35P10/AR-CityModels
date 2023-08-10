@@ -37,16 +37,21 @@ public:
         isVertexUpdated = false;
     }
 
-    void render(Shader shader) {
+    void render(Shader shader, Shader shader_Models) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         shader.use();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+
+        shader_Models.use();
+        for(auto model:Models) {
+           model.render(shader); 
+        }
     }
 
     void add_model(Model copy) {
-        Modelos.push_back(copy);
+        Models.push_back(copy);
     }
 
     bool has_collision_with(glm::mat4 object) {
@@ -126,7 +131,7 @@ public:
 
 
 private:
-    vector<Model> Modelos;
+    vector<Model> Models;
     float range_Colission = 0.2f;
     unsigned int VBO, VAO, EBO;
     float vertices2[24] = {

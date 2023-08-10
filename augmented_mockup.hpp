@@ -266,7 +266,9 @@ public:
             Mockup_base.update_vertices();
             colorShader.use();
             colorShader.setMat4("projection", projection);
-            Mockup_base.render(colorShader);
+            ourShader.use();
+            ourShader.setMat4("projection", projection);
+            Mockup_base.render(colorShader, ourShader);
 
 
             for(auto i:ids){
@@ -281,17 +283,22 @@ public:
                 Models[i]->render(ourShader);
             }
 
+            std::cout << "++++++++++ myInteractor: " << myInteractor.has_Copy() << std::endl;
+
+            if (myInteractor.get_reactorMarkerDetected() && myInteractor.has_Copy()) {
+                std::cout << "++++++++++ REACTOR DETECTADO ++++++++++" << std::endl;
+                if (Mockup_base.has_collision_with(myInteractor.get_viewMatrix_reactor())) {
+                    std::cout << "+++++ Hay colision con plano y modelo." << std::endl;
+                    std::cout << "****** ANIADIR MODELO." << std::endl;
+                    Mockup_base.add_model(myInteractor.get_model());
+                }
+                myInteractor.set_hasCopy(false);
+                std::cout << "++++++++++ ++++++++++ ++++++++++" << std::endl;
+            };
+
             ourShader.use();
             ourShader.setMat4("projection", projection);
             myInteractor.render(ourShader);
-
-            if (myInteractor.isDetected() && Mockup_base.has_collision_with(myInteractor.get_viewMatrix_selector())) {
-                std::cout << "Hay colision con plano y modelo." << std::endl;
-                // if (myInteractor.get_reactorMarkerDetected() && myInteractor.has_Copy()) {
-                //     Mockup_base.add_model(myInteractor.get_model());
-                // }
-            };
-
     }
 };
 
