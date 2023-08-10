@@ -212,6 +212,7 @@ public:
                         }
                     }
                     Models[ids[i]]->set_viewMatrix(view);
+                    Models[ids[i]]->View = view;
 
                     for (int i = 0; i < 4; i++) {
                         for (int j = 0; j < 4; j++) {
@@ -282,13 +283,16 @@ public:
 
             //std::cout << "++++++++++ myInteractor: " << myInteractor.has_Copy() << std::endl;
 
-            if (myInteractor.get_reactorMarkerDetected() && myInteractor.has_Copy()) {
+            if (myInteractor.get_reactorMarkerDetected() && Mockup_base.has_collision_with(myInteractor.get_viewMatrix_reactor())) {
                 std::cout << " REACTOR DETECTADO ++++++++++" << std::endl;
-                if (Mockup_base.has_collision_with(myInteractor.get_viewMatrix_reactor())) {
-                    std::cout << " Hay colision con plano y modelo." << std::endl;
+                std::cout << " Hay colision con plano y modelo." << std::endl;
+                if(myInteractor.has_Copy()) {
                     std::cout << " ANIADIR MODELO." << std::endl;
                     Mockup_base.add_model(myInteractor.get_model(), myInteractor.get_viewMatrix_reactor());
                     myInteractor.set_hasCopy(false);
+                } else {
+                    std::cout << " BORRAR MODELO" << std::endl;
+                    Mockup_base.delete_models(myInteractor.get_viewMatrix_reactor());
                 }
                 std::cout << "++++++++++ ++++++++++ ++++++++++" << std::endl;
             };

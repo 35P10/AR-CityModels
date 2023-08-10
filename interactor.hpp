@@ -94,7 +94,7 @@ public:
     }
 
     glm::mat4 get_viewMatrix_reactor(){
-        return Reactor->get_viewMatrix();
+        return Reactor->View;
     }
         
 private:

@@ -5,6 +5,7 @@
 #include "model.hpp"
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/opengl.hpp>
+#include <chrono>
 
 class Plane {
 public:
@@ -55,6 +56,7 @@ public:
     void add_model(Model Copy, glm::mat4 viewMatrix) {
         Copy.set_viewMatrix(viewMatrix);
         Models.push_back(Copy);
+        time_add_model_start = std::chrono::high_resolution_clock::now();
     }
 
     bool has_collision_with(glm::mat4 object) {
@@ -72,7 +74,9 @@ public:
         return true;
     }
 
-    void has_collision_with_models(glm::mat4 object) {
+    void delete_models(glm::mat4 object) {
+        std::cout << "XDDDDDDDDDDDDDDDDD: " << (std::chrono::high_resolution_clock::now() - time_add_model_start).count() << std::endl;
+        if((std::chrono::high_resolution_clock::now() - time_add_model_start).count() < time_after_add_model) return;
         for(int i = 0 ; i < Models.size() ; i++) {
             if(Models[i].has_collision_with(object)) {
                 Models.erase(Models.begin() + i);
@@ -141,6 +145,8 @@ public:
         isVertexUpdated = true;
     }
 
+    std::chrono::high_resolution_clock::time_point time_add_model_start;
+    int time_after_add_model = 5407774000;
 
 private:
     vector<Model> Models;
