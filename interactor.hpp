@@ -35,6 +35,10 @@ public:
         isMarkerDetected = val;
     }
 
+    bool has_Copy() {
+        return hasCopy;
+    }
+
     bool isDetected() {
         return isMarkerDetected;
     }
@@ -48,11 +52,11 @@ public:
     }
 
 
-    int get_selectorMarkerDetected() {
+    bool get_selectorMarkerDetected() {
         return selectorMarkerDetected;
     }
 
-    int get_reactorMarkerDetected() {
+    bool get_reactorMarkerDetected() {
         return reactorMarkerDetected;
     }
 
@@ -62,6 +66,10 @@ public:
         Copy.ViewMatrixavg = copy -> ViewMatrixavg;
         hasCopy = true;
     };
+
+    Model get_model() {
+        return Copy; 
+    }
 
     void render(Shader &shader) {
         if(!isMarkerDetected || !hasCopy) return;
@@ -79,7 +87,6 @@ public:
         reactorMarkerDetected = false;
         selectorMarkerDetected = false;
     }
-
 
     glm::mat4 get_viewMatrix_selector(){
         return Selector->get_viewMatrix();

@@ -285,8 +285,12 @@ public:
             ourShader.setMat4("projection", projection);
             myInteractor.render(ourShader);
 
-            
-                        
+            if (myInteractor.isDetected() && Mockup_base.has_collision_with(myInteractor.get_viewMatrix_selector())) {
+                std::cout << "Hay colision con plano y modelo." << std::endl;
+                // if (myInteractor.get_reactorMarkerDetected() && myInteractor.has_Copy()) {
+                //     Mockup_base.add_model(myInteractor.get_model());
+                // }
+            };
 
     }
 };

@@ -2,6 +2,9 @@
 #define PLANE_H
 
 #include "shader.hpp"
+#include "model.hpp"
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/opengl.hpp>
 
 class Plane {
 public:
@@ -42,7 +45,28 @@ public:
         glBindVertexArray(0);
     }
 
-    //nota: Reducir mas adelante a una funcion!!
+    void add_model(Model copy) {
+        Modelos.push_back(copy);
+    }
+
+    bool has_collision_with(glm::mat4 object) {
+        cv::Vec3d object_centre = get_Position_on_Mat(object);
+        std::cout << "object_centre[0]: " << object_centre[0] << " vertices2[12]: " << vertices2[12] << std::endl;
+             
+        // se encuentra en x // marker 2 | marker 4
+        if (!((object_centre[0] < vertices2[12]) && (object_centre[0] > vertices2[0]))) return false;
+        // se encuentra en y
+        // if ((object_centre[1] < vertices2[13])) {
+        //     std::cout << "hay contacto\n" ;
+        // se encuentra en z // marker 3 | marker 1
+        if (!((object_centre[2] > vertices2[14]) && (object_centre[2] < vertices2[2]))) return false;
+
+        return true;
+    }
+
+    cv::Vec3d get_Position_on_Mat(glm::mat4 input){
+        return cv::Vec3d(input[3][0], input[3][1], input[3][2]);
+    }
 
     void set_vertices_top(glm::mat4 view) {
         // top - right
@@ -102,6 +126,8 @@ public:
 
 
 private:
+    vector<Model> Modelos;
+    float range_Colission = 0.2f;
     unsigned int VBO, VAO, EBO;
     float vertices2[24] = {
         // positions          // colors
