@@ -12,7 +12,24 @@ objetos en un entorno 3D.
 </p>
 
 ### PARTE GRÁFICA
-Se enfoca en representar en tiempo real la maqueta de ciudades. Para lograr esto, se utiliza la potencia de OpenGL GLFW que permite la creación de una escena virtual y el renderizado de objetos en un espacio tridimensional.
+Se enfoca en representar en tiempo real la maqueta de ciudades. Para lograr esto, se utiliza la potencia de OpenGL GLFW que permite la creación de una escena virtual y el renderizado de objetos en un espacio tridimensional.Algunas de las tareas clave de la parte gráfica incluyen:
+
+* Carga de modelos.
+* Renderizado de modelos 3D.
+<p align="left">
+  <img width="40%" height="40%" src="https://github.com/35P10/ComputerGraphics-FinalProject/blob/kemely2018-patch-1/gif/modelos.gif">
+</p>
+
+* Creación de la escena virtual.
+<p align="left">
+  <img width="40%" height="40%" src="https://github.com/35P10/ComputerGraphics-FinalProject/blob/kemely2018-patch-1/gif/plano.gif">
+</p>
+
+* Implementación de la interacción.
+* Actualización en Tiempo Real.
+<p align="left">
+  <img width="40%" height="40%" src="https://github.com/35P10/ComputerGraphics-FinalProject/blob/kemely2018-patch-1/gif/seleccionar.gif">
+</p>
 
 ### Create marker
 
