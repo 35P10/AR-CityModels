@@ -100,10 +100,10 @@ public:
         Models[23] = new Model();
         Models[24] = new Model();
         
-        Models[21]->loadModel("D:/ComputerGraphics-FinalProject/resources/objects/house/house.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
-        Models[22]->loadModel("D:/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
-        Models[23]->loadModel("D:/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.4f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
-        Models[24]->loadModel("D:/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.3f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+        Models[21]->loadModel("D:/Projects/ComputerGraphics-FinalProject/resources/objects/house/house.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+        Models[22]->loadModel("D:/Projects/ComputerGraphics-FinalProject/resources/objects/minitower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.5f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+        Models[23]->loadModel("D:/Projects/ComputerGraphics-FinalProject/resources/objects/temple/temple.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.4f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
+        Models[24]->loadModel("D:/Projects/ComputerGraphics-FinalProject/resources/objects/tower/tower.obj", glm::rotate(glm::scale(glm::mat4(1.0f), 0.3f * glm::vec3(model_scale, model_scale, model_scale)), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)));
         
         myInteractor = Interactor(5, Models[5], 6, Models[6]);
         
@@ -283,18 +283,21 @@ public:
 
             //std::cout << "++++++++++ myInteractor: " << myInteractor.has_Copy() << std::endl;
 
-            if (myInteractor.get_reactorMarkerDetected() && Mockup_base.has_collision_with(myInteractor.get_viewMatrix_reactor())) {
-                std::cout << " REACTOR DETECTADO ++++++++++" << std::endl;
-                std::cout << " Hay colision con plano y modelo." << std::endl;
-                if(myInteractor.has_Copy()) {
-                    std::cout << " ANIADIR MODELO." << std::endl;
-                    Mockup_base.add_model(myInteractor.get_model(), myInteractor.get_viewMatrix_reactor());
-                    myInteractor.set_hasCopy(false);
-                } else {
-                    std::cout << " BORRAR MODELO" << std::endl;
-                    Mockup_base.delete_models(myInteractor.get_viewMatrix_reactor());
+            if (myInteractor.get_reactorMarkerDetected()) {
+                if (Mockup_base.has_collision_with(myInteractor.get_viewMatrix_reactor())) {
+                    std::cout << " REACTOR DETECTADO ++++++++++" << std::endl;
+                    std::cout << " Hay colision con plano y modelo." << std::endl;
+                    if(myInteractor.has_Copy()) {
+                        std::cout << " ANIADIR MODELO." << std::endl;
+                        Mockup_base.add_model(myInteractor.get_model(), myInteractor.get_viewMatrix_reactor());
+                        myInteractor.set_hasCopy(false);
+                    } else {
+                        std::cout << " BORRAR MODELO" << std::endl;
+                        Mockup_base.delete_models(myInteractor.get_viewMatrix_reactor());
+                    }
+                    std::cout << "++++++++++ ++++++++++ ++++++++++" << std::endl;
                 }
-                std::cout << "++++++++++ ++++++++++ ++++++++++" << std::endl;
+                else myInteractor.set_hasCopy(false);
             };
 
             ourShader.use();
