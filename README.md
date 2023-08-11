@@ -5,10 +5,10 @@ En este proyecto, hemos utilizado un conjunto de tecnologías como OpenCV, ArUco
 objetos en un entorno 3D.
 
 <p align="center">
-  <img width="40%" height="40%" src="gif/r1.gif">
+  <img width="40%" height="40%" src="https://github.com/35P10/ComputerGraphics-FinalProject/blob/kemely2018-patch-1/gif/r1.gif">
 </p>
 <p align="center">
-  <img width="40%" height="40%" src="gif/r2.gif">
+  <img width="40%" height="40%" src="https://github.com/35P10/ComputerGraphics-FinalProject/blob/kemely2018-patch-1/gif/r2.gif">
 </p>
 
 ### PARTE GRÁFICA
